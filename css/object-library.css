@@ -1,0 +1,242 @@
+@charset "UTF-8";
+/*
+ * FILE: src/assets/scss/custom/ContentGenerator/ObjectLibrary.scss
+ * PURPOSE: Compact account-backed SVG/Object Library modal presentation.
+ * STAMP: 2026-09-09
+ * COMPILED TO: public/assets/ContentGenerator/css/object-library.css
+ */
+#cgObjectLibrary {
+  --cg-library-blue: #1769e0;
+  --cg-library-blue-hover: #1258bf;
+  --cg-library-slate: #475569;
+  --cg-library-slate-hover: #334155;
+  --cg-library-teal: #087f8c;
+  --cg-library-teal-hover: #076b76;
+  --cg-library-red: #d64550;
+  --cg-library-red-hover: #b8323d;
+}
+#cgObjectLibrary .cg-object-library__dialog {
+  width: calc(100% - 24px);
+  max-width: 660px;
+  margin: 12px auto;
+}
+#cgObjectLibrary .cg-object-library__content {
+  max-height: min(620px, calc(100vh - 24px));
+  overflow: hidden;
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.2);
+}
+#cgObjectLibrary .cg-object-library__header {
+  position: relative;
+  min-height: 48px;
+  padding: 9px 54px 9px 16px;
+  background: #f8fafc;
+  /* STAMP: 2026-09-09 - Always-visible top-right exit for the library. */
+}
+#cgObjectLibrary .cg-object-library__header .modal-title {
+  color: #27364b !important;
+  font-size: 15px;
+  line-height: 1.25;
+}
+#cgObjectLibrary .cg-object-library__header .btn-close {
+  position: absolute !important;
+  top: 8px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cg-library-red) !important;
+  background-image: none !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  box-shadow: none;
+  opacity: 1;
+}
+#cgObjectLibrary .cg-object-library__header .btn-close::before {
+  content: "×";
+  color: #fff;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+}
+#cgObjectLibrary .cg-object-library__header .btn-close:hover, #cgObjectLibrary .cg-object-library__header .btn-close:focus-visible {
+  background: var(--cg-library-red-hover) !important;
+  outline: 2px solid #f3a6ad;
+  outline-offset: 2px;
+}
+#cgObjectLibrary .cg-object-library__body {
+  padding: 12px 16px 14px;
+  background: #fff;
+}
+#cgObjectLibrary .cg-object-library__intro {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.45;
+}
+#cgObjectLibrary .cg-object-library__save {
+  margin-bottom: 10px;
+}
+#cgObjectLibrary .cg-object-library__save .form-label {
+  margin-bottom: 5px;
+  color: #26364b;
+  font-size: 12px;
+  font-weight: 700;
+}
+#cgObjectLibrary .cg-object-library__input-group {
+  flex-wrap: nowrap;
+}
+#cgObjectLibrary .cg-object-library__input-group .form-control {
+  min-width: 0;
+  min-height: 38px;
+  padding: 7px 10px;
+  border-color: #cfd8e6;
+  border-radius: 9px 0 0 9px;
+  background: #fff;
+  color: #1f2937;
+  font-size: 12px;
+}
+#cgObjectLibrary .cg-object-library__input-group .form-control::placeholder {
+  color: #8491a3;
+}
+#cgObjectLibrary .cg-object-library__input-group .form-control:focus {
+  border-color: #78aaf0;
+  box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.12);
+}
+#cgObjectLibrary .cg-object-library__search {
+  margin-bottom: 8px;
+}
+#cgObjectLibrary .cg-object-library__button,
+#cgObjectLibrary .cg-object-library__item-action {
+  border: 1px solid transparent !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-weight: 700;
+  text-shadow: none;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+#cgObjectLibrary .cg-object-library__button:hover,
+#cgObjectLibrary .cg-object-library__item-action:hover {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+#cgObjectLibrary .cg-object-library__button:focus-visible,
+#cgObjectLibrary .cg-object-library__item-action:focus-visible {
+  outline: 2px solid #82b5ff;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+#cgObjectLibrary .cg-object-library__button:active,
+#cgObjectLibrary .cg-object-library__item-action:active {
+  transform: translateY(1px);
+}
+#cgObjectLibrary .cg-object-library__button:disabled,
+#cgObjectLibrary .cg-object-library__item-action:disabled {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  opacity: 0.62;
+}
+#cgObjectLibrary .cg-object-library__button {
+  min-height: 38px;
+  padding: 7px 14px;
+  border-radius: 0 9px 9px 0;
+  font-size: 12px;
+  white-space: nowrap;
+}
+#cgObjectLibrary .cg-object-library__button--save {
+  background: var(--cg-library-blue) !important;
+  border-color: var(--cg-library-blue) !important;
+}
+#cgObjectLibrary .cg-object-library__button--save:hover, #cgObjectLibrary .cg-object-library__button--save:focus-visible {
+  background: var(--cg-library-blue-hover) !important;
+  border-color: var(--cg-library-blue-hover) !important;
+}
+#cgObjectLibrary .cg-object-library__button--search,
+#cgObjectLibrary .cg-object-library__button--more {
+  background: var(--cg-library-slate) !important;
+  border-color: var(--cg-library-slate) !important;
+}
+#cgObjectLibrary .cg-object-library__button--search:hover, #cgObjectLibrary .cg-object-library__button--search:focus-visible,
+#cgObjectLibrary .cg-object-library__button--more:hover,
+#cgObjectLibrary .cg-object-library__button--more:focus-visible {
+  background: var(--cg-library-slate-hover) !important;
+  border-color: var(--cg-library-slate-hover) !important;
+}
+#cgObjectLibrary .cg-object-library__button--more {
+  display: block;
+  margin: 10px auto 0;
+  border-radius: 8px;
+}
+#cgObjectLibrary .cg-object-library__button--more[hidden] {
+  display: none;
+}
+#cgObjectLibrary .cg-object-library__status {
+  min-height: 18px;
+  margin: 0 0 8px !important;
+  font-size: 11px !important;
+  line-height: 1.4;
+}
+#cgObjectLibrary .cg-object-library__item {
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid #dde5ef;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+#cgObjectLibrary .cg-object-library__preview {
+  width: 100%;
+  height: 92px;
+  object-fit: contain;
+}
+#cgObjectLibrary .cg-object-library__item-name {
+  color: #243248;
+  font-size: 12px;
+  line-height: 1.35;
+}
+#cgObjectLibrary .cg-object-library__item-actions {
+  gap: 5px;
+}
+#cgObjectLibrary .cg-object-library__item-action {
+  min-height: 29px;
+  padding: 4px 8px;
+  border-radius: 7px;
+  font-size: 10px;
+  line-height: 1.2;
+}
+#cgObjectLibrary .cg-object-library__item-action--primary {
+  background: var(--cg-library-blue) !important;
+}
+#cgObjectLibrary .cg-object-library__item-action--primary:hover, #cgObjectLibrary .cg-object-library__item-action--primary:focus-visible {
+  background: var(--cg-library-blue-hover) !important;
+}
+#cgObjectLibrary .cg-object-library__item-action--teal {
+  background: var(--cg-library-teal) !important;
+}
+#cgObjectLibrary .cg-object-library__item-action--teal:hover, #cgObjectLibrary .cg-object-library__item-action--teal:focus-visible {
+  background: var(--cg-library-teal-hover) !important;
+}
+#cgObjectLibrary .cg-object-library__item-action--danger {
+  background: var(--cg-library-red) !important;
+}
+#cgObjectLibrary .cg-object-library__item-action--danger:hover, #cgObjectLibrary .cg-object-library__item-action--danger:focus-visible {
+  background: var(--cg-library-red-hover) !important;
+}
+@media (max-width: 575.98px) {
+  #cgObjectLibrary .cg-object-library__dialog {
+    width: calc(100% - 16px);
+  }
+  #cgObjectLibrary .cg-object-library__body {
+    padding: 10px 12px 12px;
+  }
+  #cgObjectLibrary .cg-object-library__button {
+    padding-inline: 11px;
+  }
+}

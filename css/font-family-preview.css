@@ -1,0 +1,92 @@
+/*
+ * FILE: src/assets/scss/custom/ContentGenerator/FontFamilyPreview.scss
+ * PURPOSE: Hover-preview font family menu for the canvas Quick Action bar.
+ * STAMP: 2026-09-09
+ * COMPILED TO: public/assets/ContentGenerator/css/font-family-preview.css
+ */
+body.cg-modern-theme .cg-selection-toolbar .cg-selection-toolbar__font {
+  display: inline-flex;
+  width: 172px;
+  min-width: 172px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  overflow: hidden;
+  text-align: left;
+}
+body.cg-modern-theme .cg-selection-toolbar .cg-selection-toolbar__font span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body.cg-modern-theme .cg-selection-toolbar .cg-selection-toolbar__font i {
+  flex: 0 0 auto;
+  font-family: FontAwesome !important;
+  font-size: 12px;
+}
+body.cg-modern-theme .cg-selection-font-popover {
+  width: min(252px, calc(100vw - 16px));
+  max-height: min(440px, calc(100vh - 16px));
+  padding: 0;
+  border-color: #3f4d60;
+  background: #202b3a;
+}
+body.cg-modern-theme .cg-selection-font-popover__header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid #425166;
+  background: #182333;
+}
+body.cg-modern-theme .cg-selection-font-popover__header span {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+body.cg-modern-theme .cg-selection-font-popover__header small {
+  color: #b9c5d5;
+  font-size: 9px;
+}
+body.cg-modern-theme .cg-selection-font-popover__list {
+  padding: 5px;
+}
+body.cg-modern-theme .cg-selection-font-popover__group {
+  display: grid;
+  gap: 2px;
+  padding: 4px 0;
+}
+body.cg-modern-theme .cg-selection-font-popover__group + body.cg-modern-theme .cg-selection-font-popover__group {
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+body.cg-modern-theme .cg-selection-font-popover__group-label {
+  padding: 5px 8px 3px;
+  color: #9cabbe;
+  font: 700 9px/1.2 "Segoe UI", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+body.cg-modern-theme .cg-selection-font-popover__option {
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: left;
+}
+body.cg-modern-theme .cg-selection-font-popover__option:hover, body.cg-modern-theme .cg-selection-font-popover__option:focus-visible {
+  outline: 0;
+  background: #34465f;
+  color: #fff;
+}
+body.cg-modern-theme .cg-selection-font-popover__option.is-selected {
+  background: #1769e0;
+  color: #fff;
+}

@@ -1,0 +1,169 @@
+@charset "UTF-8";
+/*
+ * FILE: src/assets/scss/custom/ContentGenerator/LibraryIslands.scss
+ * PURPOSE: Strict footer-safe left islands for every Interactive Component.
+ * STAMP: 2026-09-10
+ * COMPILED TO: public/assets/ContentGenerator/css/library-islands.css
+ */
+body.cg-modern-theme {
+  /* Match Layers exactly: 340px panel plus its 12px left inset. */
+  /* Every library/editor uses the same deterministic, non-blocking island
+   * geometry. The preset controllers no longer depend on Bootstrap layout. */
+  /* STAMP: 2026-09-10 - Override the legacy rule that globally hides modal
+   * header exits and guarantee one readable X on every component island. */
+}
+body.cg-modern-theme.cg-sticker-island-open .cg-workspace, body.cg-modern-theme.cg-object-library-island-open .cg-workspace, body.cg-modern-theme.cg-flip-card-island-open .cg-workspace, body.cg-modern-theme.cg-tree-nodes-island-open .cg-workspace {
+  --cg-left-island-reserve: 352px;
+}
+body.cg-modern-theme #cgStickerModal.cg-sticker-modal,
+body.cg-modern-theme #cgObjectLibrary,
+body.cg-modern-theme #flipRevealPresetModal.cg-left-component-island,
+body.cg-modern-theme #treeNodesPresetModal.cg-left-component-island {
+  position: fixed !important;
+  inset: 12px auto 70px 12px !important;
+  z-index: 1260 !important;
+  width: 340px !important;
+  max-width: calc(100vw - 24px) !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  pointer-events: none;
+  display: block !important;
+}
+body.cg-modern-theme #cgStickerModal[hidden],
+body.cg-modern-theme #cgObjectLibrary[hidden],
+body.cg-modern-theme #flipRevealPresetModal[hidden],
+body.cg-modern-theme #treeNodesPresetModal[hidden] {
+  display: none !important;
+}
+body.cg-modern-theme #cgStickerModal .modal-dialog,
+body.cg-modern-theme #cgObjectLibrary .cg-object-library__dialog,
+body.cg-modern-theme #flipRevealPresetModal .modal-dialog,
+body.cg-modern-theme #treeNodesPresetModal .modal-dialog {
+  display: flex;
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  align-items: stretch;
+  pointer-events: auto;
+  transform: none !important;
+}
+body.cg-modern-theme #cgStickerModal .modal-dialog::before,
+body.cg-modern-theme #cgObjectLibrary .cg-object-library__dialog::before,
+body.cg-modern-theme #flipRevealPresetModal .modal-dialog::before,
+body.cg-modern-theme #treeNodesPresetModal .modal-dialog::before {
+  display: none !important;
+}
+body.cg-modern-theme #cgStickerModal .modal-content,
+body.cg-modern-theme #cgObjectLibrary .cg-object-library__content,
+body.cg-modern-theme #flipRevealPresetModal .modal-content,
+body.cg-modern-theme #treeNodesPresetModal .modal-content {
+  display: flex;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex-direction: column;
+  border: 1px solid rgba(202, 208, 218, 0.94) !important;
+  border-radius: 17px !important;
+  background: #fff !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.1) !important;
+}
+body.cg-modern-theme #cgStickerModal .cg-sticker-modal__body,
+body.cg-modern-theme #cgObjectLibrary .cg-object-library__body,
+body.cg-modern-theme #flipRevealPresetModal .modal-body,
+body.cg-modern-theme #treeNodesPresetModal .modal-body {
+  min-height: 0 !important;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+body.cg-modern-theme #cgStickerModal .cg-sticker-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+body.cg-modern-theme #cgStickerModal .cg-sticker-recents {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+body.cg-modern-theme #cgObjectLibrary [data-items] > [class*=col-] {
+  width: 100%;
+  max-width: 100%;
+  flex: 0 0 100%;
+}
+body.cg-modern-theme #flipRevealPresetModal .modal-header,
+body.cg-modern-theme #flipRevealPresetModal .modal-body,
+body.cg-modern-theme #flipRevealPresetModal .modal-footer,
+body.cg-modern-theme #treeNodesPresetModal .modal-header,
+body.cg-modern-theme #treeNodesPresetModal .modal-body,
+body.cg-modern-theme #treeNodesPresetModal .modal-footer {
+  background: #fff !important;
+  border-color: #e5e7eb !important;
+}
+body.cg-modern-theme #flipRevealPresetModal .modal-title,
+body.cg-modern-theme #flipRevealPresetModal label,
+body.cg-modern-theme #flipRevealPresetModal strong,
+body.cg-modern-theme #treeNodesPresetModal .modal-title,
+body.cg-modern-theme #treeNodesPresetModal label,
+body.cg-modern-theme #treeNodesPresetModal strong {
+  color: #202124 !important;
+}
+body.cg-modern-theme #flipRevealPresetModal textarea,
+body.cg-modern-theme #flipRevealPresetModal input:not([type=color]),
+body.cg-modern-theme #treeNodesPresetModal textarea,
+body.cg-modern-theme #treeNodesPresetModal input:not([type=color]) {
+  border-color: #cfd8e6 !important;
+  background: #fff !important;
+  color: #202124 !important;
+}
+body.cg-modern-theme #flipRevealPresetModal .cg-flip-preset__copy-grid,
+body.cg-modern-theme #treeNodesPresetModal .cg-flip-preset__copy-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+body.cg-modern-theme #flipRevealPresetModal .cg-flip-preset__property-grid,
+body.cg-modern-theme #flipRevealPresetModal .cg-tree-preset__property-grid,
+body.cg-modern-theme #treeNodesPresetModal .cg-flip-preset__property-grid,
+body.cg-modern-theme #treeNodesPresetModal .cg-tree-preset__property-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+body.cg-modern-theme #flipRevealPresetModal .modal-footer .btn-outline-light,
+body.cg-modern-theme #treeNodesPresetModal .modal-footer .btn-outline-light {
+  border-color: #c8d0da !important;
+  background: #fff !important;
+  color: #202124 !important;
+}
+body.cg-modern-theme .cg-left-component-island .modal-header .btn-close,
+body.cg-modern-theme #cgStickerModal .cg-sticker-modal__close {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: #dc3545 !important;
+  background-image: none !important;
+  color: #fff !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+body.cg-modern-theme .cg-left-component-island .modal-header .btn-close::before {
+  content: "×" !important;
+  color: #fff !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+@media (max-width: 720px) {
+  body.cg-modern-theme #cgStickerModal.cg-sticker-modal,
+body.cg-modern-theme #cgObjectLibrary,
+body.cg-modern-theme #flipRevealPresetModal.cg-left-component-island,
+body.cg-modern-theme #treeNodesPresetModal.cg-left-component-island {
+    width: calc(100vw - 24px) !important;
+  }
+}

@@ -1,0 +1,767 @@
+/* STAMP: 2026-09-07 - Dark toolbar dropdowns for the static Fabric iframe.
+ * Compiled to public/assets/ContentGenerator/css/quick-action-dropdown.css.
+ * Scoped to the reused inspector; canvas text and other modals are unaffected. */
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown {
+  width: min(360px, calc(100vw - 28px)) !important;
+  min-width: 0 !important;
+  max-height: min(560px, calc(100vh - 28px), var(--cg-dropdown-available-height, 560px)) !important;
+  overflow: auto;
+  color-scheme: dark;
+  background: #182333 !important;
+  color: #fff !important;
+  border: 1px solid #425166 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 12px 32px #0005;
+  /* STAMP: 2026-09-11 - ActiveSelection automation uses the same readable
+   * row width as Slide Actions while remaining responsive inside the iframe. */
+  /* STAMP: 2026-09-07 - All animation options stay visible in a compact list. */
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown.cg-toolbar-dropdown--multi-automation {
+  width: min(680px, calc(100vw - 28px)) !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown [hidden] {
+  display: none !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__header {
+  background: #182333 !important;
+  padding: 8px 10px !important;
+  border-bottom: 1px solid #425166 !important;
+  /* STAMP: 2026-09-07 - Drag handle stays accessible while scrolling. */
+  cursor: grab;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__subtitle,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__accordion-toggle,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__actions {
+  display: none !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__accordion-content {
+  display: block !important;
+  padding: 8px !important;
+  max-height: none !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__section,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__accordion-content,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__automation-host,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__automation-host .cg-object-automation__content,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__automation-host .cg-actions-fields,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__grid,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__quick-controls,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown [data-object-automation-panel],
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__field,
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-context-popup__quick-meta {
+  background: #182333 !important;
+  border-color: #425166 !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown :is(label, span, strong, p, h5, h6, small, i, a) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown :is(input:not([type="checkbox"]):not([type="range"]), select, textarea, button) {
+  color: #fff !important;
+  background-color: #253449 !important;
+  border-color: #53647b !important;
+  -webkit-text-fill-color: #fff !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown :is(input, textarea)::placeholder {
+  color: #c4ccda !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown button:hover {
+  background-color: #354b68 !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid #9acbff;
+  outline-offset: 2px;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-animation-options {
+  display: grid;
+  gap: 4px;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-animation-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 3px 5px 3px 8px;
+  border: 1px solid #425166;
+  border-radius: 6px;
+  background: #202f42;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-animation-option.is-selected {
+  border-color: #9acbff;
+  background: #304c6c;
+  box-shadow: inset 3px 0 #9acbff;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-animation-option__choice {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.3;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-animation-option__choice input {
+  margin: 0;
+  accent-color: #9acbff;
+  flex-shrink: 0;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-animation-option__preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid #53647b;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 10px;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-list {
+  display: grid;
+  gap: 7px;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-action-row-wrap {
+  overflow: hidden;
+  border: 1px solid #425166;
+  border-radius: 8px;
+  background: #202f42;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-row {
+  display: grid;
+  grid-template-columns: 26px 38px minmax(0, 1fr) 30px;
+  gap: 7px;
+  min-width: 0;
+  padding: 7px;
+  align-items: center;
+  border: 1px solid #425166;
+  border-radius: 8px;
+  background: #202f42;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-row .cg-animation-row__order {
+  width: 24px;
+  height: 24px;
+  background: #304c6c;
+  color: #dcecff !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-row .cg-object-glimpse {
+  width: 36px;
+  height: 36px;
+  flex-basis: 36px;
+  background: #fff !important;
+  border-color: #61738c !important;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-row .cg-object-glimpse img {
+  width: 30px;
+  height: 30px;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-row .cg-animation-row__name {
+  min-width: 0;
+  font-size: 12px;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-row > select {
+  grid-column: 2/-1;
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  font-size: 12px;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-action-row-wrap > .cg-selected-automation-row {
+  border: 0;
+  border-radius: 0;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-row__utility {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid #53647b;
+  border-radius: 6px;
+  font-size: 10px;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-automation-row__utility:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+body.cg-modern-theme .cg-context-popup.cg-toolbar-dropdown .cg-selected-action-row-wrap .cg-actions-fields {
+  padding: 10px;
+  border-top: 1px solid #425166;
+}
+
+/* STAMP: 2026-09-12 - Compact canvas command menu shared by every standard
+ * Fabric object. The menu intentionally uses flat rows and quiet separators
+ * so frequent editing actions remain dense, legible and predictable. */
+body.cg-modern-theme .cg-object-command-menu {
+  position: fixed;
+  z-index: 12040;
+  width: 238px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  padding: 6px;
+  overflow: auto;
+  color-scheme: dark;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 11px;
+  background: #202020;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.42), 0 2px 8px rgba(0, 0, 0, 0.34);
+  animation: cg-object-command-menu-in 90ms ease-out;
+}
+body.cg-modern-theme .cg-object-command-menu[hidden] {
+  display: none !important;
+}
+body.cg-modern-theme .cg-object-command-menu__group {
+  display: grid;
+  gap: 1px;
+}
+body.cg-modern-theme .cg-object-command-menu__separator {
+  height: 1px;
+  margin: 5px 7px;
+  background: rgba(255, 255, 255, 0.13);
+}
+body.cg-modern-theme .cg-object-command-menu button {
+  display: grid;
+  grid-template-columns: 17px minmax(0, 1fr) auto;
+  width: 100%;
+  min-height: 29px;
+  padding: 5px 8px;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #f4f4f4;
+  font: 500 12px/1.2 Arial, sans-serif;
+  text-align: left;
+  cursor: default;
+}
+body.cg-modern-theme .cg-object-command-menu button i {
+  width: 17px;
+  color: #bfc3c9;
+  font-size: 11px;
+  text-align: center;
+}
+body.cg-modern-theme .cg-object-command-menu button span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body.cg-modern-theme .cg-object-command-menu button kbd {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #aeb2b8;
+  font: 500 10px/1 Arial, sans-serif;
+  white-space: nowrap;
+}
+body.cg-modern-theme .cg-object-command-menu button:hover, body.cg-modern-theme .cg-object-command-menu button:focus-visible {
+  outline: 0;
+  background: #343434;
+  color: #fff;
+}
+body.cg-modern-theme .cg-object-command-menu button:focus-visible {
+  box-shadow: inset 2px 0 #65b8ff;
+}
+body.cg-modern-theme .cg-object-command-menu button.is-danger:hover, body.cg-modern-theme .cg-object-command-menu button.is-danger:focus-visible {
+  background: #47282c;
+  color: #ffdcdf;
+}
+body.cg-modern-theme .cg-object-command-menu button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+@keyframes cg-object-command-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.cg-modern-theme .cg-object-command-menu {
+    animation: none;
+  }
+}
+/* STAMP: 2026-09-07 - Show the canvas color beneath animated previews. */
+.cg-object-preview .cg-object-preview__stage {
+  position: relative;
+  isolation: isolate;
+  background-image: none;
+}
+
+.cg-object-preview__background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* STAMP: 2026-09-07 - Compact, scrollable Jump to Slides thumbnail choices. */
+.cg-jump-slides {
+  display: grid;
+  gap: 8px;
+  max-height: 310px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.cg-jump-slide {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #53647b;
+  border-radius: 7px;
+  padding: 7px;
+}
+
+.cg-jump-slide:has(input:checked) {
+  border-color: #9acbff;
+  box-shadow: inset 3px 0 #9acbff;
+}
+
+.cg-jump-slide__choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.cg-jump-slide__choice input {
+  flex: 0 0 auto;
+  accent-color: #76baff;
+}
+
+.cg-jump-slide__content {
+  display: grid;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.cg-jump-slide__content img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.cg-jump-slide__empty {
+  padding: 20px 4px;
+  font-size: 11px;
+}
+
+.cg-jump-slide__enlarge {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #53647b;
+  border-radius: 5px;
+}
+
+.cg-object-preview--slide .cg-object-preview__background {
+  display: none;
+}
+
+.cg-object-preview--slide .cg-object-preview__image {
+  width: 100%;
+}
+
+/* STAMP: 2026-09-07 - Drag feedback. */
+body.cg-modern-theme .cg-toolbar-dropdown.cg-context-popup--dragging .cg-context-popup__header {
+  cursor: grabbing;
+}
+
+/* STAMP: 2026-09-07 - Readable discard dialog with a single-row action footer. */
+#cgDiscardChangesModal .modal-dialog {
+  width: calc(100% - 32px);
+  max-width: 500px;
+  margin-right: auto;
+  margin-left: auto;
+}
+#cgDiscardChangesModal .modal-content {
+  border: 1px solid #dce3ec;
+  border-radius: 14px;
+  overflow: hidden;
+}
+#cgDiscardChangesModal .modal-header {
+  padding: 20px 24px;
+}
+#cgDiscardChangesModal .modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #24364d;
+}
+#cgDiscardChangesModal .modal-header .btn-close {
+  opacity: 1;
+  background-color: #e9edf3;
+}
+#cgDiscardChangesModal .modal-body {
+  padding: 20px 24px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #334155;
+}
+#cgDiscardChangesModal .modal-footer {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+}
+#cgDiscardChangesModal .modal-footer .btn {
+  margin: 0;
+  min-height: 40px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+#cgDiscardChangesModal .modal-footer .btn-outline-secondary {
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
+  background: #fff !important;
+  border: 1px solid #b8c4d3 !important;
+}
+#cgDiscardChangesModal .modal-footer .btn-outline-secondary:hover {
+  background: #edf2f7 !important;
+}
+#cgDiscardChangesModal .modal-footer .btn-danger {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  background: #c92a40 !important;
+  border: 1px solid #c92a40 !important;
+}
+#cgDiscardChangesModal .modal-footer .btn-danger:hover {
+  background: #ad2034 !important;
+}
+@media (max-width: 400px) {
+  #cgDiscardChangesModal .modal-footer {
+    padding: 16px;
+    gap: 8px;
+  }
+  #cgDiscardChangesModal .modal-footer .btn {
+    padding: 9px 10px;
+    flex: 1;
+  }
+}
+
+/* STAMP: 2026-09-10 - Compact grouped colour and typography controls for the
+ * selected-object Quick Action bar. These rules are iframe-scoped and leave
+ * the underlying Fabric colour and text-format handlers untouched. */
+body.cg-modern-theme {
+  /* STAMP: 2026-09-11 - Keep one-shot Format Painter visibly armed until a
+   * compatible target consumes it. */
+  /* STAMP: 2026-09-14 - Keep the original action controls in the toolbar as
+   * hidden event sources. The compact overflow menu below activates them,
+   * preserving every established handler without duplicating command logic. */
+  /* STAMP: 2026-09-12 - Dense H1-H6 picker positioned from the Heading
+   * button; flat rows keep the typography choices fast to scan. */
+  /* STAMP: 2026-09-11 - Compact numeric weight selector for Fabric text. */
+  /* STAMP: 2026-09-10 - Effects use the full More-popover row and wrap at
+   * narrow iframe widths so every action remains visible and clickable. */
+}
+body.cg-modern-theme .cg-selection-toolbar [data-cg-selection-action=format-painter].is-active {
+  border-color: #65b8ff;
+  background: #244c6d;
+  box-shadow: inset 0 0 0 1px rgba(101, 184, 255, 0.38);
+}
+body.cg-modern-theme .cg-selection-toolbar--text {
+  height: 40px;
+}
+body.cg-modern-theme .cg-selection-toolbar--text > button {
+  height: 40px;
+  flex-basis: 38px;
+}
+body.cg-modern-theme .cg-selection-toolbar__grouped-sources {
+  display: none !important;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover {
+  width: 244px;
+  max-height: min(430px, calc(100vh - 24px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__sections {
+  display: grid;
+  gap: 8px;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__section {
+  display: grid;
+  gap: 3px;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__section > span {
+  padding: 0 7px;
+  color: #92979e;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__section > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__section button {
+  display: flex;
+  min-width: 0;
+  min-height: 34px;
+  padding: 7px 8px;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #f3f4f6;
+  font-size: 10px;
+  line-height: 1.2;
+  text-align: left;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__section button:hover, body.cg-modern-theme .cg-selection-more-actions-popover__section button:focus-visible {
+  outline: 0;
+  background: #393939;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__section button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__section button i {
+  width: 13px;
+  flex: 0 0 13px;
+  color: #d7dbe0 !important;
+  text-align: center;
+}
+body.cg-modern-theme .cg-selection-more-actions-popover__section button span {
+  min-width: 0;
+}
+body.cg-modern-theme .cg-selection-toolbar__color-menu,
+body.cg-modern-theme .cg-selection-toolbar__menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 46px;
+  padding: 0 7px;
+}
+body.cg-modern-theme .cg-selection-toolbar__color-menu svg,
+body.cg-modern-theme .cg-selection-toolbar__menu-button svg {
+  width: 28px;
+  height: 22px;
+  overflow: visible;
+}
+body.cg-modern-theme .cg-selection-toolbar__color-menu svg circle,
+body.cg-modern-theme .cg-selection-toolbar__menu-button svg circle {
+  stroke: rgba(255, 255, 255, 0.72);
+  stroke-width: 1.25;
+}
+body.cg-modern-theme .cg-selection-toolbar__color-menu .fa-angle-down,
+body.cg-modern-theme .cg-selection-toolbar__menu-button .fa-angle-down {
+  font-size: 9px;
+  color: #c8c8c8 !important;
+}
+body.cg-modern-theme .cg-selection-quick-popover__close {
+  display: inline-grid;
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+}
+body.cg-modern-theme .cg-selection-quick-popover__close:hover, body.cg-modern-theme .cg-selection-quick-popover__close:focus-visible {
+  background: #3a3a3a;
+}
+body.cg-modern-theme .cg-selection-color-popover {
+  width: 232px;
+}
+body.cg-modern-theme .cg-selection-color-popover__tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+  margin-bottom: 9px;
+  padding: 3px;
+  border-radius: 7px;
+  background: #151515;
+}
+body.cg-modern-theme .cg-selection-color-popover__tabs button {
+  min-height: 30px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #bfc3c9;
+  font-size: 11px;
+  font-weight: 650;
+}
+body.cg-modern-theme .cg-selection-color-popover__tabs button.is-active {
+  background: #383838;
+  color: #fff;
+}
+body.cg-modern-theme .cg-selection-color-popover__choose {
+  display: grid;
+  grid-template-columns: 32px 1fr 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 7px 9px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #444;
+  border-radius: 7px;
+  background: #2b2b2b;
+  color: #fff;
+  text-align: left;
+}
+body.cg-modern-theme .cg-selection-color-popover__choose:hover, body.cg-modern-theme .cg-selection-color-popover__choose:focus-visible {
+  background: #383838;
+  border-color: #5c5c5c;
+}
+body.cg-modern-theme .cg-selection-color-popover__choose svg {
+  width: 28px;
+  height: 28px;
+}
+body.cg-modern-theme .cg-selection-color-popover__choose svg rect {
+  stroke: rgba(255, 255, 255, 0.65);
+  stroke-width: 1;
+}
+body.cg-modern-theme .cg-selection-color-popover__choose span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+body.cg-modern-theme .cg-selection-color-popover__choose b {
+  font-size: 11px;
+  line-height: 1.2;
+}
+body.cg-modern-theme .cg-selection-color-popover__choose small {
+  color: #b7bbc1;
+  font-size: 9px;
+  line-height: 1.2;
+}
+body.cg-modern-theme .cg-selection-text-style-popover {
+  width: 224px;
+}
+body.cg-modern-theme .cg-selection-heading-popover {
+  width: 216px;
+}
+body.cg-modern-theme .cg-selection-heading-popover__list {
+  display: grid;
+  gap: 2px;
+}
+body.cg-modern-theme .cg-selection-heading-popover__list button {
+  display: grid;
+  grid-template-columns: 27px minmax(0, 1fr) auto;
+  min-height: 32px;
+  padding: 5px 8px;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #f4f4f4;
+  text-align: left;
+}
+body.cg-modern-theme .cg-selection-heading-popover__list button:hover, body.cg-modern-theme .cg-selection-heading-popover__list button:focus-visible {
+  outline: 0;
+  background: #393939;
+}
+body.cg-modern-theme .cg-selection-heading-popover__list button b {
+  font: 300 13px/1 Impact, sans-serif;
+  letter-spacing: 0.02em;
+}
+body.cg-modern-theme .cg-selection-heading-popover__list button span {
+  font: 300 12px/1.2 Impact, sans-serif;
+}
+body.cg-modern-theme .cg-selection-heading-popover__list button small {
+  color: #aeb2b8;
+  font-size: 9px;
+}
+body.cg-modern-theme .cg-selection-text-style-popover__weight {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 8px;
+  color: #e8e8e8;
+  font-size: 10px;
+  font-weight: 700;
+}
+body.cg-modern-theme .cg-selection-text-style-popover__weight select {
+  width: 100%;
+  height: 34px;
+  padding: 0 28px 0 9px;
+  border: 1px solid #414141;
+  border-radius: 6px;
+  background: #252525;
+  color: #fff;
+  font-size: 11px;
+}
+body.cg-modern-theme .cg-selection-text-style-popover__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+body.cg-modern-theme .cg-selection-text-style-popover__actions button {
+  display: flex;
+  min-height: 34px;
+  padding: 0 9px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #414141;
+  border-radius: 6px;
+  background: #2d2d2d;
+  color: #fff;
+  font-size: 10px;
+  text-align: left;
+}
+body.cg-modern-theme .cg-selection-text-style-popover__actions button:hover, body.cg-modern-theme .cg-selection-text-style-popover__actions button:focus-visible {
+  background: #3a3a3a;
+}
+body.cg-modern-theme .cg-selection-text-style-popover__actions button.is-active {
+  border-color: #65b8ff;
+  background: #244c6d;
+}
+body.cg-modern-theme .cg-selection-text-style-popover__actions button i {
+  width: 12px;
+  color: #fff !important;
+  text-align: center;
+}
+body.cg-modern-theme #TextHighlightEffect {
+  white-space: nowrap;
+}
+body.cg-modern-theme .cg-selection-text-more-popover > .cg-effect-presets {
+  grid-column: 1/-1;
+  width: 100% !important;
+  overflow: visible;
+}
+body.cg-modern-theme .cg-selection-text-more-popover .cg-effect-presets__actions {
+  display: flex !important;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+body.cg-modern-theme .cg-selection-text-more-popover .cg-effect-preset {
+  flex: 0 0 auto;
+  max-width: 100%;
+  padding-inline: 8px !important;
+}

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content Preview</title>
+    <!-- Shared Google Fonts catalog stamped 2026-04-07:
+         reuse the same font source as the editor so preview text renders with
+         the exported families already supported by the content generator. -->
+    <link href="./css/Fonts.css" type="text/css" rel="stylesheet" media="screen" />
+    <link rel="stylesheet" href="./css/preview-content-modal-shared.css?v=20260827-3" />
+</head>
+
+<body class="preview-content-standalone learner-course-shell">
+    <!--
+        Preview shell for standalone slide rendering.
+        Keep the key IDs in this file stable because main.js binds to them directly.
+    -->
+    <div class="preview-content-modal__shell preview-content-modal__shell--standalone">
+        <div class="preview-content-modal__topbar">
+            <div class="preview-content-modal__topbar-inner">
+                <div class="preview-content-modal__topbar-left">
+                    <div class="preview-content-modal__unit-heading" id="unit-title">Content Preview</div>
+                </div>
+                <div class="preview-content-modal__topbar-right">
+                    <button type="button" class="preview-content-modal__exit-btn" id="previewExitBtn" aria-label="Close preview" onclick="handlePreviewExit()">
+                        Exit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <main class="preview-content-modal__standalone-main">
+            <!--
+                STAMP: 2026-08-12
+                Use the exact player class contract from PreviewContentModal.js.
+                Standalone-only spacing was intentionally removed so the header,
+                content container, and footer share the modal's geometry.
+            -->
+            <div id="content-container" class="course-preview-layout preview-content-modal__player">
+                <div class="preview-content-modal__page-shell">
+                    <div class="widget-row">
+                        <div class="course-preview-rail course-preview-rail--prev preview-content-modal__rail"></div>
+                        <div id="content_Section" class="preview-content-modal__stage">
+                            <div class="widget-bg-color-white widget-tab content_section_inner course-preview-card preview-content-modal__page-card">
+                                <div class="contentheader course-preview-header">
+                                    <div class="course-preview-header-main">
+                                        <div class="course-preview-title-row">
+                                            <label id="content-title" class="course-preview-title">Content Preview</label>
+                                        </div>
+                                    </div>
+                                    <div id="moremenudef" class="course-preview-header-side">
+                                        <label id="lblvideostatus" style="display: none;" class="vidctrl"></label>
+                                    </div>
+                                </div>
+
+                                <!--
+                                    Main render area used by main.js.
+                                    - content_Section is resized when media opens/closes
+                                    - closevid is toggled for embedded media
+                                    - contentdata is the mount point where decoded SVG/HTML is inserted
+                                -->
+                                <button id="closevid" class="preview-content-modal__media-close vidctrl" type="button" onclick="CloseVideo()" style="display: none;">Close</button>
+                                <div class="content-box" id="contentdata">
+                                    <!-- STAMP: 2026-08-27 - Progressive feedback while preview data is decoded and rendered. -->
+                                    <div class="preview-progress-loader" role="status" aria-live="polite">
+                                        <div class="preview-progress-loader__icon" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                                        <div class="preview-progress-loader__copy">
+                                            <strong>Preparing preview</strong>
+                                            <small>Rendering your latest slide content...</small>
+                                        </div>
+                                        <div class="preview-progress-loader__track" aria-hidden="true"><span></span></div>
+                                    </div>
+                                </div>
+
+                                <div id="desc_container" style="display: none;" class="ui-widget-content">
+                                    <audio id="desc_audio" style="display: none;"></audio>
+                                    <div class="pull-left" id="desc_containerdata">
+                                        <button id="closedesc_container" class="preview-content-modal__close-icon" type="button" aria-label="Close description">&times;</button>
+                                        <div class="pull-left me-2 w-15">
+                                            <div id="desc_containerimg" class="pull-left">
+                                                <img id="desc_image" class="w-100" src="#" alt="description" />
+                                            </div>
+                                        </div>
+                                        <div class="pull-left w-80">
+                                            <label id="desc_header"></label>
+                                            <div id="desc_containerin" class="w-100 fw-500">
+                                                <p id="desc_data" class="px-1"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="clear: both;"></div>
+                                </div>
+
+                                <!-- STAMP: 2026-08-27 - Runtime reveals this only after eligible navigation is resolved. -->
+                                <div class="contentfooter" style="display: none;" aria-hidden="true">
+                                    <!--
+                                        Stamped 2026-05-06:
+                                        The preview audio dock now mirrors the course preview player pattern
+                                        while still using the legacy runtime hooks for source updates.
+                                    -->
+                                    <div id="previewAudioDock" class="content_audio_container preview-content-modal__audio-dock" style="display: none;">
+                                        <button id="pp" class="preview-content-modal__play-btn" type="button" aria-label="Play audio">
+                                            <svg class="preview-content-modal__play-icon preview-content-modal__play-icon--play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <circle cx="12" cy="12" r="11" fill="white"></circle>
+                                                <polygon points="10,8 17,12 10,16" fill="#16233b"></polygon>
+                                            </svg>
+                                            <svg class="preview-content-modal__play-icon preview-content-modal__play-icon--pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display: none;">
+                                                <circle cx="12" cy="12" r="11" fill="white"></circle>
+                                                <rect x="9" y="8" width="2.6" height="8" rx="1.1" fill="#16233b"></rect>
+                                                <rect x="12.4" y="8" width="2.6" height="8" rx="1.1" fill="#16233b"></rect>
+                                            </svg>
+                                        </button>
+                                        <span id="dur" class="time preview-content-modal__time">00:00</span>
+                                        <input id="seek" class="preview-content-modal__seek" type="range" min="0" value="0" step="0.1" aria-label="Seek preview audio">
+                                        <audio id="previewAudioPlayer" class="preview-content-modal__audio-player" preload="metadata" style="display: none;"></audio>
+                                    </div>
+
+                                    <!--
+                                        STAMP: 2026-08-27
+                                        Hidden by default. Content/main.js reveals this control only when
+                                        the payload has multiple slides and ShowNavigate is enabled.
+                                    -->
+                                    <div id="content_nav_section" style="display: none;" aria-hidden="true">
+                                        <a id="sldnavprev" class="sldnav p-0" onclick="SlidePrevious()" style="display: inline-flex;">Previous</a>
+                                        <span class="preview-content-modal__page-counter preview-content-modal__page-counter--static" aria-live="polite">
+                                            <span id="content_current_slide">1</span>
+                                            <span>of</span>
+                                            <span id="content_total_slides">1</span>
+                                        </span>
+                                        <a id="sldnavnext" class="sldnav p-0" onclick="SlideNext()" style="display: inline-flex;">Next</a>
+                                    </div>
+                                    <div style="clear: both;"></div>
+                                </div>
+                                <div class="content-footer-bannerline"></div>
+                            </div>
+                        </div>
+                        <div class="course-preview-rail course-preview-rail--next preview-content-modal__rail"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- main.js contains the runtime used to render the stored slide JSON. -->
+    <script src="../Content/main.js?v=20260911-font-runtime-3"></script>
+    <script>
+        (function () {
+            var previewAudioSrc = "";
+            var previewAudioPafv = 0;
+            var previewAudioControlsBound = false;
+
+            function formatPreviewAudioTime(totalSeconds) {
+                var safeSeconds = Number(totalSeconds);
+                if (!isFinite(safeSeconds) || safeSeconds < 0) {
+                    safeSeconds = 0;
+                }
+
+                var minutes = Math.floor(safeSeconds / 60);
+                var seconds = Math.floor(safeSeconds % 60);
+
+                return String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+            }
+
+            function setPreviewAudioButtonState(isPlaying) {
+                var playButton = document.getElementById("pp");
+                var playIcon = document.querySelector(".preview-content-modal__play-icon--play");
+                var pauseIcon = document.querySelector(".preview-content-modal__play-icon--pause");
+
+                if (!playButton) {
+                    return;
+                }
+
+                playButton.setAttribute("aria-label", isPlaying ? "Pause audio" : "Play audio");
+
+                if (playIcon) {
+                    playIcon.style.display = isPlaying ? "none" : "block";
+                }
+
+                if (pauseIcon) {
+                    pauseIcon.style.display = isPlaying ? "block" : "none";
+                }
+            }
+
+            function syncPreviewAudioProgress() {
+                var previewAudioPlayer = document.getElementById("previewAudioPlayer");
+                var seek = document.getElementById("seek");
+                var durationLabel = document.getElementById("dur");
+
+                if (!previewAudioPlayer || !seek || !durationLabel) {
+                    return;
+                }
+
+                if (!previewAudioPlayer.duration || !isFinite(previewAudioPlayer.duration)) {
+                    seek.value = 0;
+                    seek.max = 0;
+                    durationLabel.textContent = "00:00";
+                    return;
+                }
+
+                seek.max = previewAudioPlayer.duration;
+                seek.value = previewAudioPlayer.currentTime || 0;
+                durationLabel.textContent = formatPreviewAudioTime(previewAudioPlayer.currentTime || 0);
+            }
+
+            function bindPreviewAudioControls() {
+                var previewAudioPlayer = document.getElementById("previewAudioPlayer");
+                var playButton = document.getElementById("pp");
+                var seek = document.getElementById("seek");
+
+                if (!previewAudioPlayer || !playButton || !seek || previewAudioControlsBound) {
+                    return;
+                }
+
+                previewAudioControlsBound = true;
+
+                playButton.addEventListener("click", function () {
+                    if (previewAudioPlayer.paused) {
+                        previewAudioPlayer.play().catch(function () { });
+                        return;
+                    }
+
+                    previewAudioPlayer.pause();
+                });
+
+                seek.addEventListener("input", function () {
+                    var nextTime = Number(seek.value);
+
+                    if (isFinite(nextTime)) {
+                        previewAudioPlayer.currentTime = nextTime;
+                        syncPreviewAudioProgress();
+                    }
+                });
+
+                previewAudioPlayer.addEventListener("loadedmetadata", syncPreviewAudioProgress);
+                previewAudioPlayer.addEventListener("timeupdate", syncPreviewAudioProgress);
+                previewAudioPlayer.addEventListener("play", function () {
+                    setPreviewAudioButtonState(true);
+                });
+                previewAudioPlayer.addEventListener("pause", function () {
+                    setPreviewAudioButtonState(false);
+                    syncPreviewAudioProgress();
+                });
+                previewAudioPlayer.addEventListener("ended", function () {
+                    setPreviewAudioButtonState(false);
+                    syncPreviewAudioProgress();
+                    if (typeof window.handleSlideMediaEnded === "function") {
+                        window.handleSlideMediaEnded("audio");
+                    }
+                });
+            }
+
+            window.handlePreviewExit = function () {
+                try {
+                    if (window.parent && window.parent !== window) {
+                        var parentModal = window.parent.document.getElementById("previewFullscreenModal");
+                        if (parentModal && window.parent.bootstrap && typeof window.parent.bootstrap.Modal === "function") {
+                            var modalInstance = window.parent.bootstrap.Modal.getInstance(parentModal) || window.parent.bootstrap.Modal.getOrCreateInstance(parentModal);
+                            modalInstance.hide();
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    // Fallbacks below handle standalone preview windows and any cross-context access edge cases.
+                }
+
+                if (window.opener && !window.opener.closed) {
+                    window.close();
+                    return;
+                }
+
+                if (window.history.length > 1) {
+                    window.history.back();
+                    return;
+                }
+
+                window.location.href = "/";
+            };
+
+            function setPreviewNavbarTitle(previewData) {
+                var unitTitleElement = document.getElementById("unit-title");
+                var contentTitleElement = document.getElementById("content-title");
+                var fallbackTitle = "Content Preview";
+                var previewTitle = fallbackTitle;
+
+                if (Array.isArray(previewData) && previewData.length > 0) {
+                    var firstSlide = previewData[0] || {};
+                    previewTitle =
+                        firstSlide.UniquepgeName ||
+                        firstSlide.PageName ||
+                        firstSlide.SlideName ||
+                        firstSlide.slide_name ||
+                        fallbackTitle;
+                }
+
+                if (unitTitleElement) {
+                    unitTitleElement.textContent = previewTitle;
+                }
+
+                if (contentTitleElement) {
+                    contentTitleElement.textContent = previewTitle;
+                }
+
+                document.title = previewTitle + " | Content Preview";
+            }
+
+            function updatePreviewAudioPlaybackState() {
+                var previewAudioPlayer = document.getElementById("previewAudioPlayer");
+                var previewAudioDock = document.getElementById("previewAudioDock");
+
+                if (!previewAudioPlayer || !previewAudioDock) {
+                    return;
+                }
+
+                if (!previewAudioSrc) {
+                    previewAudioPlayer.pause();
+                    previewAudioPlayer.removeAttribute("src");
+                    previewAudioPlayer.load();
+                    previewAudioDock.style.display = "none";
+                    setPreviewAudioButtonState(false);
+                    return;
+                }
+
+                if (previewAudioPlayer.getAttribute("src") !== previewAudioSrc) {
+                    previewAudioPlayer.setAttribute("src", previewAudioSrc);
+                    previewAudioPlayer.load();
+                }
+
+                bindPreviewAudioControls();
+                previewAudioDock.style.display = "flex";
+                syncPreviewAudioProgress();
+            }
+
+            var storedData = null;
+            try {
+                storedData = localStorage.getItem("preview_slide_data");
+            } catch (storageError) {
+                console.warn("Legacy preview storage is unavailable; waiting for preview data.", storageError);
+            }
+
+            if (typeof window.updateAudioSrc !== "function") {
+                window.updateAudioSrc = function (newSrc) {
+                    previewAudioSrc = newSrc || "";
+                    updatePreviewAudioPlaybackState();
+                };
+            }
+
+            if (typeof window.updateAudioPAFV !== "function") {
+                window.updateAudioPAFV = function (pafv) {
+                    previewAudioPafv = Number(pafv) || 0;
+                };
+            }
+
+            if (typeof window.togglePlayerVisibility !== "function") {
+                window.togglePlayerVisibility = function (visibility) {
+                    var previewAudioDock = document.getElementById("previewAudioDock");
+                    var previewAudioPlayer = document.getElementById("previewAudioPlayer");
+
+                    if (!previewAudioDock || !previewAudioPlayer) {
+                        return;
+                    }
+
+                    if (!visibility || !previewAudioSrc) {
+                        previewAudioPlayer.pause();
+                        previewAudioDock.style.display = "none";
+                        return;
+                    }
+
+                    updatePreviewAudioPlaybackState();
+                };
+            }
+
+            if (typeof window.trackCourseVideoContent !== "function") {
+                window.trackCourseVideoContent = function () { };
+            }
+
+            if (typeof window.svgPanZoom !== "function") {
+                window.svgPanZoom = function () { return {}; };
+            }
+
+            var previewAudioPlayer = document.getElementById("previewAudioPlayer");
+            if (previewAudioPlayer) {
+                previewAudioPlayer.addEventListener("canplay", function () {
+                    bindPreviewAudioControls();
+                    if (previewAudioPafv === 0) {
+                        previewAudioPlayer.play().catch(function () { });
+                    } else {
+                        setPreviewAudioButtonState(false);
+                    }
+                });
+            }
+
+            /**
+             * STAMP: 2026-08-20 - Initialize from an in-memory postMessage payload.
+             * The storage read remains only for backward compatibility with older links.
+             */
+            var previewInitialized = false;
+
+            function initializePreviewData(rawData, removeLegacyStorage) {
+                if (previewInitialized || !rawData) return;
+                try {
+                    window.reactData = typeof rawData === "string" ? JSON.parse(rawData) : rawData;
+                    setPreviewNavbarTitle(window.reactData);
+                    window.contentType = "Page";
+                    window.contentStatus = "0";
+                    window.isLoading = false;
+                    previewInitialized = true;
+                    handleInit();
+                    if (removeLegacyStorage) {
+                        try {
+                            localStorage.removeItem("preview_slide_data");
+                        } catch (storageError) { }
+                    }
+                } catch (error) {
+                    console.error("Unable to initialize preview data:", error);
+                }
+            }
+
+            window.addEventListener("message", function (event) {
+                if (event.origin !== window.location.origin || !event.data || event.data.type !== "PREVIEW_SLIDE_DATA") return;
+                initializePreviewData(event.data.contentData, false);
+            });
+
+            if (storedData) initializePreviewData(storedData, true);
+
+            var previewHost = window.opener || (window.parent !== window ? window.parent : null);
+            if (previewHost && typeof previewHost.postMessage === "function") {
+                previewHost.postMessage({ type: "PREVIEW_READY" }, window.location.origin);
+            }
+        })();
+    </script>
+</body>
+
+</html>

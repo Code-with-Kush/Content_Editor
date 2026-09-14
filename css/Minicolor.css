@@ -1,0 +1,267 @@
+﻿#canvshub .fr-popup.fr-active {
+    display: block;
+}
+
+#canvshub .fr-popup {
+    display: none;
+    color: #222222;
+    background: #ffffff;
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 1px 1px rgba(0,0,0,0.16);
+    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.12),0 1px 1px 1px rgba(0,0,0,0.16);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 1px 1px rgba(0,0,0,0.16);
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    user-select: none;
+    -o-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    margin-top: 0px;
+    z-index: 2147483635;
+    text-align: left;
+    border: 1px solid #eef0f8;
+    text-rendering: optimizelegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.4;
+    width: auto;
+    background: #e8e8e8 !important;
+    left: 0px;
+    width: 97%;
+}
+
+    #canvshub .fr-popup .fr-color-set > span:hover, #canvshub .fr-popup .fr-color-set > span:focus {
+        outline: 1px solid #222222;
+        z-index: 2;
+        border-radius:20px !important;
+    }
+
+.fr-desktop .fr-command:hover, .fr-desktop .fr-command:focus {
+    outline: 0;
+    color: #222222;
+    background: #ebebeb;
+}
+
+#canvshub .fr-popup .fr-color-set > span {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    position: relative;
+    z-index: 1;
+    border-radius: 20px;
+    border: 2px solid #333;
+    margin-bottom: 10px;
+}
+
+#canvshub .fr-popup .fr-color-set > div > span {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    position: relative;
+    z-index: 1;
+    border-radius: 20px;
+    border: 2px solid #333;
+    margin-bottom: 10px;
+}
+
+span.fr-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+#canvshub .fr-popup .fr-layer.fr-active {
+    display: inline-block;
+}
+
+#canvshub .fr-popup .fr-color-hex-layer {
+    width: 100%;
+    margin: 0px;
+    padding: 5px;
+}
+
+@media (min-width: 768px) {
+    #canvshub .fr-popup .fr-layer {
+        width: 300px;
+    }
+}
+
+#canvshub .fr-popup .fr-layer {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0px;
+    display: none;
+}
+
+#canvshub .fr-popup .fr-color-hex-layer .fr-input-line {
+    float: left;
+    width: calc(100% - 50px);
+    padding: 8px 0 0;
+    font-size: 11px;
+    width: 100%;
+    color: red;
+}
+
+#canvshub .fr-popup .fr-input-line {
+    position: relative;
+    padding: 8px 0;
+}
+
+    #canvshub .fr-popup .fr-input-line input[type="text"], #canvshub .fr-popup .fr-input-line textarea {
+        width: 60%;
+        margin: 0px 0 1px 0;
+        border: none;
+        border-bottom: solid 1px #bdbdbd;
+        color: #222222;
+        font-size: 14px;
+        padding: 6px 0 2px;
+        background: rgba(0,0,0,0);
+        position: relative;
+        z-index: 2;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        height: 27px;
+    }
+
+input[type="text"], input[type="password"], input[type="email"], textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+#canvshub .fr-popup input, #canvshub .fr-popup textarea {
+    user-select: text;
+    -o-user-select: text;
+    -moz-user-select: text;
+    -khtml-user-select: text;
+    -webkit-user-select: text;
+    -ms-user-select: text;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    outline: none;
+}
+
+button, input, optgroup, select, textarea {
+    color: inherit;
+    font: inherit;
+    margin: 0;
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#canvshub .fr-popup .fr-color-hex-layer .fr-action-buttons {
+    float: right;
+    width: 50px;
+}
+
+#canvshub .fr-popup .fr-action-buttons {
+    z-index: 7;
+    height: 36px;
+    text-align: right;
+}
+
+#canvshub .fr-popup .fr-color-hex-layer .fr-action-buttons button {
+    background-color: #1e88e5;
+    color: #FFF;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    font-size: 13px;
+    height: 32px;
+}
+
+#canvshub .fr-popup .fr-action-buttons button.fr-command {
+    height: 36px;
+    line-height: 1;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    font-size: 16px;
+    outline: none;
+    -webkit-transition: background 0.2s ease 0s;
+    -moz-transition: background 0.2s ease 0s;
+    -ms-transition: background 0.2s ease 0s;
+    -o-transition: background 0.2s ease 0s;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+}
+
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+    -webkit-appearance: button;
+    cursor: pointer;
+}
+
+button, select {
+    text-transform: none;
+}
+
+button {
+    border: 0;
+    background: none;
+    padding: 0;
+}
+
+button {
+    overflow: visible;
+}
+
+button, input, optgroup, select, textarea {
+    color: inherit;
+    font: inherit;
+    margin: 0;
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.fr-color-set {
+    padding: 10px;
+}
+
+#canvshub .fr-popup .fr-color-set > span > i {
+    text-align: center;
+    line-height: 32px;
+    height: 32px;
+    width: 32px;
+    font-size: 13px;
+    position: absolute;
+    bottom: -2px;
+    cursor: default;
+    left: -2px;
+}

@@ -1,0 +1,137 @@
+/*
+ * FILE: src/assets/scss/custom/ContentGenerator/FileDropzone.scss
+ * PURPOSE: Shared drag-and-drop surface for visible canvas file uploaders.
+ * STAMP: 2026-09-09
+ * COMPILED TO: public/assets/ContentGenerator/css/file-dropzone.css
+ */
+.cg-file-dropzone-host {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.cg-file-dropzone__legacy-trigger,
+.cg-file-dropzone-host > br {
+  display: none !important;
+}
+
+input.cg-file-dropzone__input {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+.cg-file-dropzone {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border: 1px dashed #94a3b8;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+.cg-file-dropzone:hover, .cg-file-dropzone.is-dragging {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.12);
+}
+.cg-file-dropzone:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+.cg-file-dropzone.is-selected {
+  border-color: #16a085;
+  background: #eefbf7;
+}
+.cg-file-dropzone.is-error {
+  border-color: #ef4444;
+  background: #fff1f2;
+}
+
+.cg-file-dropzone__icon {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 9px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 15px;
+}
+
+.cg-file-dropzone__copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  text-align: left;
+}
+.cg-file-dropzone__copy strong {
+  color: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.cg-file-dropzone__copy small {
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.cg-file-dropzone__name {
+  overflow: hidden;
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Dark inspector/dropdown variant used by canvas quick actions. */
+body.cg-modern-theme .cg-context-popup .cg-file-dropzone,
+body.cg-modern-theme .cg-toolbar-dropdown .cg-file-dropzone {
+  border-color: #60738c;
+  background: #223147;
+  color: #fff;
+}
+body.cg-modern-theme .cg-context-popup .cg-file-dropzone:hover, body.cg-modern-theme .cg-context-popup .cg-file-dropzone.is-dragging,
+body.cg-modern-theme .cg-toolbar-dropdown .cg-file-dropzone:hover,
+body.cg-modern-theme .cg-toolbar-dropdown .cg-file-dropzone.is-dragging {
+  border-color: #7db5ff;
+  background: #293c56;
+}
+body.cg-modern-theme .cg-context-popup .cg-file-dropzone.is-selected,
+body.cg-modern-theme .cg-toolbar-dropdown .cg-file-dropzone.is-selected {
+  border-color: #48c9ad;
+  background: #203f43;
+}
+body.cg-modern-theme .cg-context-popup .cg-file-dropzone.is-error,
+body.cg-modern-theme .cg-toolbar-dropdown .cg-file-dropzone.is-error {
+  border-color: #fb7185;
+  background: #482937;
+}
+body.cg-modern-theme .cg-context-popup .cg-file-dropzone__copy small,
+body.cg-modern-theme .cg-toolbar-dropdown .cg-file-dropzone__copy small {
+  color: #bdc9d9;
+}
+body.cg-modern-theme .cg-context-popup .cg-file-dropzone__name,
+body.cg-modern-theme .cg-toolbar-dropdown .cg-file-dropzone__name {
+  color: #9dc6ff;
+}
+
+.cg-actions-fields .cg-file-dropzone {
+  min-height: 68px;
+}

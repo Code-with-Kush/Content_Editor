@@ -1,0 +1,1272 @@
+/* Content Generator Bootstrap overrides stamped 2026-05-08:
+   compact header dropdowns, Bootstrap-aligned menu structure, and layered modal fixes. */
+
+body .modal {
+  z-index: 110020;
+}
+
+body .modal-backdrop {
+  z-index: 110010;
+}
+
+/* Strict Bootstrap modal centering stamped 2026-05-08:
+   enforce middle-screen placement for every standard Bootstrap dialog, including
+   older modal markup that does not include .modal-dialog-centered. */
+body .modal.show {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.75rem !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+body .modal.show .modal-dialog {
+  position: relative;
+  z-index: 1;
+}
+
+body .modal.show .modal-dialog:not(.modal-fullscreen) {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: calc(100vw - 1.5rem) !important;
+  max-height: calc(100dvh - 1.5rem);
+  margin: 0 auto !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+body .modal.show .modal-dialog:not(.modal-fullscreen) .modal-content {
+  max-height: calc(100dvh - 1.5rem);
+}
+
+/* STAMP: 2026-08-27 - Keep delete dialogs centered at identical coordinates
+   for both lifecycle states; only opacity and scale animate, so opening and
+   closing never produces a positional jump. */
+body #deleteObjectModal.fade .modal-dialog,
+body #deleteSlideModal.fade .modal-dialog {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  margin: 0 auto !important;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.985) !important;
+  transition: opacity .18s ease, transform .18s ease !important;
+}
+
+body #deleteObjectModal.show .modal-dialog,
+body #deleteSlideModal.show .modal-dialog {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+/* STAMP: 2026-08-27 - Dedicated delete-modal control avoids the shared
+   .btn-close cascade and stays pinned to the container's top-right corner. */
+html body #deleteObjectModal .cg-delete-modal-close,
+html body #deleteSlideModal .cg-delete-modal-close {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  left: auto !important;
+  z-index: 5 !important;
+  display: inline-grid !important;
+  width: 26px !important;
+  height: 26px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  place-items: center !important;
+  border: 1px solid #d92d20 !important;
+  border-radius: 6px !important;
+  background: #d92d20 !important;
+  color: #fff !important;
+  cursor: pointer;
+}
+
+html body #deleteObjectModal .cg-delete-modal-close i,
+html body #deleteSlideModal .cg-delete-modal-close i {
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: 14px !important;
+}
+
+body .modal.show .modal-dialog:not(.modal-fullscreen) .modal-body {
+  overflow: auto;
+}
+
+body .modal.show .modal-fullscreen {
+  align-self: stretch;
+  margin: 0 !important;
+}
+
+body.cg-preview-modal-open #previewFullscreenModal {
+  z-index: 110100;
+}
+
+body.cg-preview-modal-open .modal-backdrop.show.cg-preview-modal-backdrop {
+  z-index: 110090;
+}
+
+/* Success and danger action text stamp 2026-05-08:
+   keep every green/red action surface in the content generator strictly white
+   so labels and icon glyphs remain readable across Bootstrap and custom themes. */
+body .btn-success,
+body .btn-success *,
+body .btn-danger,
+body .btn-danger * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Hover/click actions stamp 2026-05-08:
+   give the effect buttons identical width and a visible gap without changing
+   their runtime visibility or click handlers. */
+body .cg-hover-actions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+body .cg-hover-actions>.btn {
+  width: 100% !important;
+  min-height: 2.5rem;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Semantic button hover lock stamp 2026-05-08:
+   keep success, danger, and warning buttons visually stable so hovering or
+   focusing does not change their fill, border, text, or shadow treatment. */
+body .btn {
+  --bs-btn-hover-color: var(--bs-btn-color);
+  --bs-btn-hover-bg: var(--bs-btn-bg);
+  --bs-btn-hover-border-color: var(--bs-btn-border-color);
+  --bs-btn-focus-shadow-rgb: transparent;
+  --bs-btn-active-color: var(--bs-btn-color);
+  --bs-btn-active-bg: var(--bs-btn-bg);
+  --bs-btn-active-border-color: var(--bs-btn-border-color);
+  --bs-btn-active-shadow: none;
+  transition: none !important;
+}
+
+body .btn-success,
+body .btn-danger,
+body .btn-warning {
+  --bs-btn-hover-color: var(--bs-btn-color);
+  --bs-btn-hover-bg: var(--bs-btn-bg);
+  --bs-btn-hover-border-color: var(--bs-btn-border-color);
+  --bs-btn-focus-shadow-rgb: transparent;
+  --bs-btn-active-color: var(--bs-btn-color);
+  --bs-btn-active-bg: var(--bs-btn-bg);
+  --bs-btn-active-border-color: var(--bs-btn-border-color);
+  --bs-btn-active-shadow: none;
+}
+
+body .btn-success:hover,
+body .btn-success:focus,
+body .btn-success:focus-visible,
+body .btn-success:active,
+body .btn-success.active,
+body .show>.btn-success.dropdown-toggle,
+body .btn-danger:hover,
+body .btn-danger:focus,
+body .btn-danger:focus-visible,
+body .btn-danger:active,
+body .btn-danger.active,
+body .show>.btn-danger.dropdown-toggle,
+body .btn-warning:hover,
+body .btn-warning:focus,
+body .btn-warning:focus-visible,
+body .btn-warning:active,
+body .btn-warning.active,
+body .show>.btn-warning.dropdown-toggle {
+  color: var(--bs-btn-color) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  -webkit-text-fill-color: var(--bs-btn-color) !important;
+}
+
+/* Global button hover freeze stamped 2026-05-19:
+   keep button foreground, background, border, and elevation unchanged across
+   the content generator when the pointer enters or the control receives focus. */
+body .btn:hover,
+body .btn:focus,
+body .btn:focus-visible,
+body .btn:active,
+body .btn.active,
+body .show>.btn.dropdown-toggle {
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu a.btn,
+body.cg-modern-theme .cg-slide-action-button,
+body.cg-modern-theme .cg-context-popup__action-button,
+body.cg-modern-theme .cg-slide-load-more-btn {
+  transition: none !important;
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu a.btn:hover,
+body.cg-modern-theme #canvasheader .dropdown-menu a.btn:focus,
+body.cg-modern-theme #canvasheader .dropdown-menu a.btn:focus-visible,
+body.cg-modern-theme #canvasheader .dropdown-menu a.btn:active,
+body.cg-modern-theme #canvasheader .dropdown-menu a.btn.active,
+body.cg-modern-theme #canvasheader .dropdown-menu .show>a.btn.dropdown-toggle {
+  color: var(--bs-btn-color) !important;
+  background: var(--bs-btn-bg) !important;
+  border-color: var(--bs-btn-border-color) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  -webkit-text-fill-color: var(--bs-btn-color) !important;
+}
+
+body.cg-modern-theme .cg-slide-action-button:hover,
+body.cg-modern-theme .cg-slide-action-button:focus,
+body.cg-modern-theme .cg-slide-action-button:focus-visible,
+body.cg-modern-theme .cg-slide-action-button:active,
+body.cg-modern-theme .cg-slide-action-button.show {
+  background: rgba(17, 24, 39, 0.82) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18) !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+body.cg-modern-theme .cg-context-popup__action-button:hover,
+body.cg-modern-theme .cg-context-popup__action-button:focus,
+body.cg-modern-theme .cg-context-popup__action-button:focus-visible,
+body.cg-modern-theme .cg-context-popup__action-button:active {
+  border-color: rgba(51, 65, 85, 0.92) !important;
+  background: linear-gradient(180deg, #4b5563 0%, #374151 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 6px 14px rgba(15, 23, 42, 0.18) !important;
+  color: #fff !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+body.cg-modern-theme .cg-slide-load-more-btn:hover,
+body.cg-modern-theme .cg-slide-load-more-btn:focus,
+body.cg-modern-theme .cg-slide-load-more-btn:focus-visible,
+body.cg-modern-theme .cg-slide-load-more-btn:active {
+  border-color: rgba(123, 150, 182, 0.74) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(235, 241, 248, 0.96) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 1px 2px rgba(15, 23, 42, 0.05) !important;
+  color: #154980 !important;
+  filter: none !important;
+  transform: none !important;
+  outline: none !important;
+}
+
+body.cg-modern-theme #loader {
+  background: rgba(241, 246, 252, 0.82);
+  backdrop-filter: blur(10px);
+  z-index: 3000;
+}
+
+/* Generated slide rail scroll override stamped 2026-04-10:
+   keep the live sortable slide stack scrollable without changing add/select/reorder behavior. */
+body.cg-modern-theme #slidesection .generatedSlides,
+body.cg-modern-theme #slidesection .generatedSlides.ui-sortable {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: min(52vh, calc(100dvh - 260px)) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  -ms-overflow-style: auto;
+}
+
+body.cg-modern-theme #slidesection .generatedSlides::-webkit-scrollbar,
+body.cg-modern-theme #slidesection .generatedSlides.ui-sortable::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body.cg-modern-theme #slidesection .generatedSlides::-webkit-scrollbar-thumb,
+body.cg-modern-theme #slidesection .generatedSlides.ui-sortable::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(123, 135, 148, 0.55);
+}
+
+body.cg-modern-theme #slidesection .generatedSlides::-webkit-scrollbar-track,
+body.cg-modern-theme #slidesection .generatedSlides.ui-sortable::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.12);
+  border-radius: 999px;
+}
+
+@media (max-width: 1180px) {
+
+  body.cg-modern-theme #slidesection .generatedSlides,
+  body.cg-modern-theme #slidesection .generatedSlides.ui-sortable {
+    max-height: 100% !important;
+  }
+}
+
+body.cg-modern-theme #canvasheader {
+  --bs-dropdown-min-width: 14rem;
+  --bs-dropdown-padding-x: 0.35rem;
+  --bs-dropdown-padding-y: 0.35rem;
+  --bs-dropdown-font-size: 0.875rem;
+  --bs-dropdown-color: #111827;
+  --bs-dropdown-bg: rgba(255, 255, 255, 0.98);
+  --bs-dropdown-border-color: rgba(15, 23, 42, 0.08);
+  --bs-dropdown-border-radius: 0.75rem;
+  --bs-dropdown-box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+/* Canvas header icon buttons stamped 2026-05-08:
+   single compact bordered treatment for native links, buttons, Bootstrap dropdowns,
+   and custom slide controls without changing existing click handlers. */
+body.cg-modern-theme #canvasheader .button.hollow,
+body.cg-modern-theme #canvasheader button.button.hollow,
+body.cg-modern-theme #canvasheader a.button.hollow,
+body.cg-modern-theme #canvasheader .dropdown>.dropdown-toggle,
+body.cg-modern-theme #canvasheader .custom-toggle,
+body.cg-modern-theme #canvasheader #canvasback {
+  min-width: 1.9rem !important;
+  width: 1.9rem;
+  height: 1.9rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 0.5rem !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045)) !important;
+  color: #fff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.16);
+  line-height: 1 !important;
+  text-align: center;
+  vertical-align: middle;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+body.cg-modern-theme #canvasheader .custom-toggle {
+  width: auto;
+  padding: 0 0.55rem !important;
+}
+
+body.cg-modern-theme #canvasheader .button.hollow i,
+body.cg-modern-theme #canvasheader .dropdown>.dropdown-toggle i,
+body.cg-modern-theme #canvasheader .custom-toggle i,
+body.cg-modern-theme #canvasheader #canvasback i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff !important;
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+body.cg-modern-theme #canvasheader .dropdown>.dropdown-toggle:hover,
+body.cg-modern-theme #canvasheader .dropdown>.dropdown-toggle:focus,
+body.cg-modern-theme #canvasheader .custom-toggle:hover,
+body.cg-modern-theme #canvasheader .custom-toggle:focus,
+body.cg-modern-theme #canvasheader .button.hollow:hover,
+body.cg-modern-theme #canvasheader .button.hollow:focus,
+body.cg-modern-theme #canvasheader #canvasback:hover,
+body.cg-modern-theme #canvasheader #canvasback:focus {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.16);
+  transform: none;
+}
+
+body.cg-modern-theme #canvasheader .dropdown>.dropdown-toggle::after,
+body.cg-modern-theme #canvasheader .custom-toggle::after {
+  margin-left: 0.28rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+body.cg-modern-theme #canvasheader .dropdown>.dropdown-toggle:empty::after {
+  margin-left: 0;
+}
+
+body.cg-modern-theme #canvasheader .canvas-bg-thumb {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 0.26rem;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+}
+
+/* Selected-object quick icons stamped 2026-05-08:
+   match group, ungroup, and share-property icons with the smooth bordered
+   canvas header buttons while respecting their runtime hidden states. */
+body.cg-modern-theme #canvasheader #divGeneralProperties>.input-group-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+body.cg-modern-theme #canvasheader #divGeneralProperties>.input-group-button>a:not([data-cg-hidden]) {
+  min-width: 1.9rem !important;
+  width: 1.9rem;
+  height: 1.9rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 0.5rem !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045)) !important;
+  color: #fff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.16);
+  line-height: 1 !important;
+  text-align: center;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+body.cg-modern-theme #canvasheader #divGeneralProperties>.input-group-button>a:not([data-cg-hidden]):hover,
+body.cg-modern-theme #canvasheader #divGeneralProperties>.input-group-button>a:not([data-cg-hidden]):focus {
+  border-color: rgba(255, 255, 255, 0.42) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 2px 5px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+
+body.cg-modern-theme #canvasheader #divGeneralProperties>.input-group-button>a:not([data-cg-hidden]) i {
+  color: #fff !important;
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu,
+body.cg-modern-theme #canvasheader .cstm-avat-dropdown {
+  min-width: min(20rem, calc(100vw - 1rem));
+  max-width: calc(100vw - 1rem);
+  margin-top: 0.5rem !important;
+  padding: 0.55rem 0.35rem 0.35rem !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  border-radius: 0.75rem !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12) !important;
+  backdrop-filter: blur(14px);
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu.show,
+body.cg-modern-theme #canvasheader .cstm-avat-dropdown.show {
+  animation: cg-header-dropdown-in 0.16s ease-out;
+  transform-origin: top center;
+}
+
+body.cg-modern-theme .cg-draggable-dropdown-menu {
+  touch-action: none;
+}
+
+/* Dropdown edge resize handles stamped 2026-05-08:
+   expose left/right horizontal resizing while leaving the menu body draggable. */
+body.cg-modern-theme .dropdown-menu>.cg-dropdown-resize-handle {
+  position: absolute;
+  top: 1.45rem;
+  bottom: 0.35rem;
+  z-index: 3;
+  width: 0.5rem;
+  cursor: ew-resize;
+  touch-action: none;
+  border-radius: 999px;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease;
+}
+
+body.cg-modern-theme .dropdown-menu>.cg-dropdown-resize-handle--left {
+  left: 0;
+}
+
+body.cg-modern-theme .dropdown-menu>.cg-dropdown-resize-handle--right {
+  right: 0;
+}
+
+body.cg-modern-theme .dropdown-menu:hover>.cg-dropdown-resize-handle,
+body.cg-modern-theme .dropdown-menu>.cg-dropdown-resize-handle:hover {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.16);
+}
+
+body.cg-modern-theme .cg-draggable-dropdown-menu--resizing {
+  cursor: ew-resize;
+  user-select: none;
+}
+
+body.cg-dropdown-resizing {
+  cursor: ew-resize;
+  user-select: none;
+}
+
+body.cg-modern-theme .dropdown-menu>.cg-dropdown-close {
+  position: absolute;
+  top: -5px;
+  right: -7px;
+  z-index: 2;
+  width: 1.1rem;
+  height: 1.1rem;
+  min-width: 0;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  background: #dc3545;
+  color: #ffffff !important;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: none;
+}
+
+body.cg-modern-theme .dropdown-menu>.cg-dropdown-close:hover,
+body.cg-modern-theme .dropdown-menu>.cg-dropdown-close:focus {
+  border-color: rgba(220, 38, 38, 0.35);
+  background: #fff1f2;
+  color: #be123c !important;
+}
+
+body.cg-modern-theme .cg-draggable-dropdown-menu>.dropdown-header,
+body.cg-modern-theme .cg-draggable-dropdown-menu .dropdown-header:first-child {
+  cursor: move;
+}
+
+body.cg-modern-theme .cg-draggable-dropdown-menu--dragging {
+  cursor: move;
+  user-select: none;
+}
+
+body.cg-dropdown-dragging {
+  cursor: move;
+  user-select: none;
+}
+
+/* Dropdown heading divider stamped 2026-05-19:
+   standardize toolbar dropdown headings and separate the title row from the
+   interactive menu content without changing any dropdown behavior. */
+body.cg-modern-theme #canvasheader .dropdown-header {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.55rem;
+  padding: 0.50rem 1.25rem 0.5rem 0.50rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.32);
+  color: #111827 !important;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #bfbfbf;
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu a,
+body.cg-modern-theme #canvasheader .dropdown-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding: 0.45rem 0.65rem !important;
+  color: #111827 !important;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  border-radius: 0.5rem !important;
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu a:hover,
+body.cg-modern-theme #canvasheader .dropdown-menu .dropdown-item:hover,
+body.cg-modern-theme #canvasheader .dropdown-menu a:focus,
+body.cg-modern-theme #canvasheader .dropdown-menu .dropdown-item:focus {
+  color: #0f172a !important;
+  background: rgba(226, 232, 240, 0.68) !important;
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu .dropdown-divider {
+  margin: 0.35rem 0;
+}
+
+/* Emoji header dropdown stamped 2026-05-08:
+   compact emoji picker next to the Text menu, using Bootstrap dropdown layout
+   while keeping each emoji as a direct canvas insertion button. */
+body.cg-modern-theme #canvasheader .cg-emoji-dropdown {
+  width: min(18rem, calc(100vw - 1rem));
+  min-width: min(18rem, calc(100vw - 1rem));
+}
+
+body.cg-modern-theme #canvasheader .cg-emoji-dropdown__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.35rem;
+  padding: 0.15rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-emoji-option {
+  width: 2.15rem;
+  height: 2.15rem;
+  min-width: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 0.55rem;
+  background: linear-gradient(180deg, #fff, #f8fafc);
+  color: #111827;
+  font-size: 1.15rem;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+body.cg-modern-theme #canvasheader .cg-emoji-option:hover,
+body.cg-modern-theme #canvasheader .cg-emoji-option:focus {
+  border-color: rgba(37, 99, 235, 0.36);
+  background: #eff6ff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.12);
+  transform: translateY(-1px);
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu .btn {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+}
+
+body.cg-modern-theme #canvasheader .dropdown-menu .form-control,
+body.cg-modern-theme #canvasheader .dropdown-menu select,
+body.cg-modern-theme #canvasheader .dropdown-menu textarea {
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+}
+
+/* Transform dropdown compact grid stamped 2026-05-08:
+   preserve the legacy table and handlers while presenting controls in one dense horizontal panel. */
+body.cg-modern-theme #canvasheader .cg-transform-dropdown {
+  width: min(21rem, calc(100vw - 1rem));
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__panel {
+  padding: 0;
+  gap: 0.6rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__title {
+  margin-bottom: 0.45rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__table,
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__section {
+  display: grid;
+  gap: 0.45rem;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: transparent !important;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__table {
+  display: grid;
+  gap: 0.6rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__toggle {
+  min-height: 2.15rem;
+  width: 100%;
+  padding: 0.35rem 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.55rem;
+  background: #f8fafc;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__toggle .form-check-input {
+  width: 1.75rem;
+  height: 0.9rem;
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__toggle .form-check-label {
+  margin: 0;
+  color: #111827;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 0.6rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__field {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: #111827;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__field--wide {
+  grid-column: 1 / -1;
+  grid-template-columns: 3rem minmax(0, 1fr);
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__value {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 2rem;
+  margin: 0 !important;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 999px;
+  background: #fff;
+  color: #111827;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__section-title {
+  margin: 0 !important;
+  padding: 0.42rem 0.6rem;
+  border-radius: 0.35rem;
+  background: #e5e7eb;
+  color: #475569 !important;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__actions--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__actions a {
+  min-width: 0;
+  min-height: 2.9rem !important;
+  padding: 0.55rem !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.5rem !important;
+  background: #f8fafc !important;
+  color: #111827 !important;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 6px 14px rgba(15, 23, 42, 0.06);
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__actions a:hover,
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__actions a:focus {
+  border-color: rgba(37, 99, 235, 0.36);
+  background: #eef5ff !important;
+  color: #0f172a !important;
+  transform: none;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__actions a i {
+  color: inherit !important;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+body.cg-modern-theme #canvasheader .cg-transform-dropdown__actions a span {
+  display: none;
+}
+
+/* Alignment dropdown compact grid stamped 2026-05-08:
+   keep the existing table IDs and handlers while matching the Shapes dropdown button rhythm. */
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown {
+  min-width: 0 !important;
+  width: fit-content !important;
+  max-width: none !important;
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__panel {
+  width: fit-content;
+  padding: 0;
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__title {
+  margin-bottom: 0.35rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__table,
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__table tbody,
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__table tr {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__table--primary tr {
+  grid-template-columns: repeat(6, 2.55rem);
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__table--group tr {
+  grid-template-columns: repeat(6, 2.55rem);
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__table td {
+  display: block;
+  width: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__toggle-row {
+  grid-column: 1 / -1;
+  margin-bottom: 0.15rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__toggle {
+  min-height: 2rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.45rem;
+  background: rgba(248, 250, 252, 0.9);
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__action {
+  width: 2.55rem !important;
+  height: 2.25rem !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 0.45rem !important;
+  background: #f8fafc !important;
+  color: #111827 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__action:hover,
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__action:focus {
+  border-color: rgba(37, 99, 235, 0.42);
+  background: #eef5ff !important;
+  color: #0f172a !important;
+  transform: none;
+}
+
+body.cg-modern-theme #canvasheader .cg-alignment-dropdown__action i {
+  color: inherit !important;
+  font-size: 0.95rem !important;
+  line-height: 1;
+}
+
+/* Shadow dropdown compact stack stamped 2026-05-19:
+   keep the existing shadow controls and IDs while aligning the panel with the
+   same minimal single-column treatment used by the cleaned-up toolbar menus. */
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown {
+  width: min(27rem, calc(100vw - 1rem));
+  min-width: 220px !important;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__panel {
+  display: grid;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__title {
+  margin-bottom: 0.35rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__table,
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__table tbody {
+  display: grid;
+  gap: 0.7rem;
+  width: 100%;
+  margin: 0;
+  border: 0;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__table tr,
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__table td {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__swatch-row {
+  display: grid;
+  gap: 0.45rem;
+  color: #111827;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__swatch {
+  width: 100%;
+  min-height: 1.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.45rem 0.6rem;
+  color: #111827;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__control .ng-binding {
+  float: none;
+  display: block;
+  margin: 0;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__value {
+  width: 4.2rem !important;
+  height: 2rem;
+  margin: 0 !important;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 999px !important;
+  background: #fff;
+  color: #111827;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center !important;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown input[type="range"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 0.1rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown .minrange,
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown .maxrange {
+  width: auto;
+  margin-top: -0.1rem;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown .minrange {
+  justify-self: start;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown .maxrange {
+  justify-self: end;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__footer {
+  padding-top: 0.15rem;
+}
+
+body.cg-modern-theme #canvasheader .cg-shadow-dropdown__remove {
+  width: 100%;
+  min-height: 2.35rem;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+}
+
+.cg-hidden {
+  display: none;
+}
+
+[data-cg-hidden] {
+  display: none;
+}
+
+/* Color picker default state stamped 2026-05-08:
+   keep the legacy Froala active popup class from displaying the palette on first render. */
+#colorPickerPopup[data-cg-hidden] {
+  display: none;
+}
+
+/* Minicolors interaction repair stamped 2026-05-08:
+   keep the extended picker selectable after the popup was redesigned and moved
+   above editor panels. The panel must remain visible and receive drag events. */
+body.cg-modern-theme #colorPickerPopup,
+body.cg-modern-theme #colorPickerPopup #hexColorLayer,
+body.cg-modern-theme #colorPickerPopup #hexColorLayer .fr-input-line,
+body.cg-modern-theme #colorPickerPopup .minicolors {
+  overflow: visible !important;
+}
+
+body.cg-modern-theme #colorPickerPopup .minicolors {
+  position: relative;
+  display: block;
+  width: 100%;
+  pointer-events: auto;
+  z-index: 4;
+}
+
+body.cg-modern-theme #colorPickerPopup .minicolors-input {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+body.cg-modern-theme #colorPickerPopup .minicolors-theme-bootstrap .minicolors-swatch {
+  display: block !important;
+  pointer-events: auto;
+}
+
+body.cg-modern-theme #colorPickerPopup .minicolors-theme-bootstrap .minicolors-panel {
+  z-index: 110060 !important;
+  pointer-events: auto;
+}
+
+body.cg-modern-theme #colorPickerPopup .minicolors-theme-bootstrap .minicolors-grid,
+body.cg-modern-theme #colorPickerPopup .minicolors-theme-bootstrap .minicolors-slider,
+body.cg-modern-theme #colorPickerPopup .minicolors-theme-bootstrap .minicolors-opacity-slider,
+body.cg-modern-theme #colorPickerPopup .minicolors-theme-bootstrap .minicolors-picker {
+  pointer-events: auto;
+}
+
+.cg-field-full {
+  width: 100%;
+}
+
+.cg-editor-textarea {
+  width: 100%;
+  height: 120px;
+}
+
+.cg-editor-textarea-sm {
+  width: 228px;
+  height: 120px;
+  margin: 0;
+}
+
+.cg-textarea-fixed {
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+}
+
+.cg-clear-both {
+  clear: both;
+}
+
+.cg-sidenav-closed {
+  width: 0;
+}
+
+.cg-iframe-fluid {
+  width: 100%;
+  border: 0;
+}
+
+.cg-iframe-resize {
+  height: 70vh;
+}
+
+.cg-iframe-preview {
+  height: 100%;
+  min-height: 100vh;
+}
+
+.cg-swatch-muted {
+  color: #ccc;
+}
+
+.cg-swatch-black {
+  color: #000;
+}
+
+.cg-bg-black {
+  background: rgb(0, 0, 0);
+}
+
+.cg-transparent-bg {
+  background-image: url("../images/Transparent.png");
+  background-size: 100px 100px;
+}
+
+.cg-color-swatch--violet {
+  background: #9400d3;
+}
+
+.cg-color-swatch--indigo {
+  background: #4b0082;
+}
+
+.cg-color-swatch--blue {
+  background: #0000ff;
+}
+
+.cg-color-swatch--green {
+  background: #00ff00;
+}
+
+.cg-color-swatch--yellow {
+  background: #ffff00;
+}
+
+.cg-color-swatch--orange {
+  background: #ff7f00;
+}
+
+.cg-color-swatch--red {
+  background: #ff0000;
+}
+
+.cg-color-swatch--black {
+  background: #000;
+}
+
+.cg-color-swatch--white {
+  background: #fff;
+}
+
+.cg-crop-wrapper {
+  position: relative;
+  display: inline-block;
+  max-width: 50%;
+}
+
+.cg-crop-preview {
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  display: block;
+}
+
+.cg-crop-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  border-radius: 6px;
+}
+
+.cg-optimized-preview {
+  max-width: 50%;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  display: block;
+}
+
+@media (max-width: 720px) {
+  body.cg-modern-theme #canvasheader {
+    --bs-dropdown-min-width: 12rem;
+  }
+
+  body.cg-modern-theme #canvasheader .dropdown-menu,
+  body.cg-modern-theme #canvasheader .cstm-avat-dropdown {
+    min-width: calc(100vw - 1rem);
+  }
+
+  body.cg-modern-theme #canvasheader .dropdown>.dropdown-toggle,
+  body.cg-modern-theme #canvasheader .custom-toggle {
+    min-width: 1.9rem;
+    height: 1.9rem;
+    padding: 0 0.45rem;
+  }
+
+  body.cg-modern-theme #canvasheader .cg-alignment-dropdown__table--primary tr,
+  body.cg-modern-theme #canvasheader .cg-alignment-dropdown__table--group tr {
+    grid-template-columns: repeat(3, 2.55rem);
+  }
+
+  body.cg-modern-theme #canvasheader .cg-transform-dropdown {
+    width: min(22rem, calc(100vw - 1rem));
+  }
+
+  body.cg-modern-theme #canvasheader .cg-transform-dropdown__field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.cg-modern-theme #canvasheader .cg-transform-dropdown__field--wide {
+    grid-column: auto;
+  }
+
+  body.cg-modern-theme #canvasheader .cg-transform-dropdown__actions--four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@keyframes cg-header-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
