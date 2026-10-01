@@ -6,7 +6,7 @@ The editor provides a PowerPoint-style canvas experience with editable text, ima
 
 > Repository: https://github.com/Code-with-Kush/Content_Editor
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1011ba9e-0dd2-4830-8cfc-2725c4e6354b" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b913b2e9-6b4f-4c7b-802b-e638d389c1b3" />
 
 
 ---
