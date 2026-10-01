@@ -17,11 +17,25 @@ body.cg-modern-theme {
   /* STAMP: 2026-09-10 - Convert Shapes into the same footer-safe island as
    * Layers. Its library markup and insertion handlers remain untouched. */
 }
+body.cg-modern-theme.cg-canvas-surface-plain {
+  /* STAMP: 2026-09-14 - The stage overlay sits above Fabric at z-index
+   * 20. Keep it transparent when removing dots so Shift+G cannot mask
+   * authored objects with an opaque white layer. */
+}
+body.cg-modern-theme.cg-canvas-surface-plain .cg-stage-column,
 body.cg-modern-theme.cg-canvas-surface-plain .cg-workspace::after,
 body.cg-modern-theme.cg-canvas-surface-plain .cg-slide-shell.cg-slide-dock,
+body.cg-modern-theme.cg-canvas-surface-plain .cg-slide-shell #slidebars.slidebarsections,
+body.cg-modern-theme.cg-canvas-surface-plain .cg-slide-shell #slidesection,
+body.cg-modern-theme.cg-canvas-surface-plain .cg-slide-shell #slidesection .generatedSlides,
+body.cg-modern-theme.cg-canvas-surface-plain .cg-slide-shell #slidesection .generatedSlides.ui-sortable,
 body.cg-modern-theme.cg-canvas-surface-plain #canvas-container #myObjnav,
 body.cg-modern-theme.cg-canvas-surface-plain .cg-slide-shell #slidesection .cg-slide-actions {
   background-color: #fff !important;
+  background-image: none !important;
+}
+body.cg-modern-theme.cg-canvas-surface-plain .cg-canvas-stage::after {
+  background-color: transparent !important;
   background-image: none !important;
 }
 body.cg-modern-theme .cg-workspace::after {

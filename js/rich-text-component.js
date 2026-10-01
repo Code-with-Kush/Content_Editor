@@ -305,6 +305,7 @@
         let lastAcceptedHtml = ""
         let isRestoringEditor = false
         let editingTarget = null
+        let directTextPlacementArmed = false
 
         $editor.summernote({ placeholder: "Add formatted text...", dialogsInBody: true, toolbar: [["style", ["style"]], ["font", ["bold", "italic", "underline", "clear"]], ["para", ["ul", "ol", "paragraph"]], ["insert", ["link", "table", "hr"]], ["view", ["codeview"]]] })
 
@@ -437,18 +438,40 @@
             if (transform && transform.target && transform.action === "resizing") transform.target.cgAutoTextWidth = false
         })
 
-        function insertDirectTextObject() {
+        function setDirectTextPlacementMode(isArmed) {
+            if (isArmed) {
+                window.dispatchEvent(new CustomEvent("cg:canvas-placement-armed", { detail: { owner: "text" } }))
+            }
+            directTextPlacementArmed = Boolean(isArmed)
+            document.body.classList.toggle("cg-direct-text-placement", directTextPlacementArmed)
+            const trigger = document.getElementById("addDirectText")
+            if (trigger) trigger.setAttribute("aria-pressed", String(directTextPlacementArmed))
+        }
+
+        /**
+         * STAMP: 2026-09-15 - Normal text uses Arial 16 and may be placed at
+         * the author's next canvas click. Calls without a point preserve the
+         * established centred insertion contract used by the public API.
+         *
+         * @param {{x: number, y: number}=} placementPoint Canvas scene point.
+         * @returns {fabric.Textbox} Newly inserted editable text object.
+         */
+        function insertDirectTextObject(placementPoint) {
             const canvasBounds = getCanvasBounds(canvas)
             const objectId = config.generateId("textbox_")
+            const requestedLeft = Number(placementPoint && placementPoint.x)
+            const requestedTop = Number(placementPoint && placementPoint.y)
+            const defaultLeft = Math.max(CANVAS_PADDING, Math.round((canvasBounds.width - 420) / 2))
+            const defaultTop = Math.max(CANVAS_PADDING, Math.round((canvasBounds.height - 80) / 2))
             const textObject = new fabric.Textbox("", {
                 id: objectId,
                 name: `Rich_Text_${Math.floor(1000 + (Math.random() * 9000))}`,
-                left: Math.max(CANVAS_PADDING, Math.round((canvasBounds.width - 420) / 2)),
-                top: Math.max(CANVAS_PADDING, Math.round((canvasBounds.height - 80) / 2)),
+                left: Number.isFinite(requestedLeft) ? Math.max(0, Math.min(canvasBounds.width - 2, requestedLeft)) : defaultLeft,
+                top: Number.isFinite(requestedTop) ? Math.max(0, Math.min(canvasBounds.height - 16, requestedTop)) : defaultTop,
                 width: 2,
                 minWidth: 2,
                 cgAutoTextWidth: true,
-                fontSize: 18,
+                fontSize: 16,
                 fontFamily: "Arial",
                 fontWeight: window.CG_DEFAULT_TEXT_FONT_WEIGHT || "100",
                 fill: "#111827",
@@ -518,6 +541,24 @@
         }
 
         canvas.on("text:editing:exited", removeEmptyDraftTextObject)
+
+        /* STAMP: 2026-09-15 - The top Text control arms a one-shot placement
+         * mode. The next primary canvas click owns the insertion coordinates,
+         * then the existing immediate-edit flow displays the blinking caret. */
+        canvas.on("mouse:down", function (event) {
+            if (!directTextPlacementArmed || !event || !event.e || event.e.button > 0) return
+            const point = event.scenePoint || (typeof canvas.getScenePoint === "function" ? canvas.getScenePoint(event.e) : canvas.getPointer(event.e))
+            if (!point || !Number.isFinite(Number(point.x)) || !Number.isFinite(Number(point.y))) return
+            setDirectTextPlacementMode(false)
+            insertDirectTextObject({ x: Number(point.x), y: Number(point.y) })
+        })
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && directTextPlacementArmed) setDirectTextPlacementMode(false)
+        })
+        window.addEventListener("cg:canvas-placement-armed", function (event) {
+            if (directTextPlacementArmed && event.detail && event.detail.owner !== "text") setDirectTextPlacementMode(false)
+        })
 
         /** Apply rich clipboard HTML at the Fabric caret without a group/image. */
         function insertRichClipboard(target, html) {
@@ -641,7 +682,7 @@
         $(document).off("click.cgDirectText", "#addDirectText").on("click.cgDirectText", "#addDirectText", function (event) {
             event.preventDefault()
             event.stopPropagation()
-            insertDirectTextObject()
+            setDirectTextPlacementMode(!directTextPlacementArmed)
         })
 
         document.addEventListener("paste", function (event) {

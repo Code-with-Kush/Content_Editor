@@ -6,7 +6,9 @@
  * COMPILED TO: public/assets/ContentGenerator/css/library-islands.css
  */
 body.cg-modern-theme {
-  /* Match Layers exactly: 340px panel plus its 12px left inset. */
+  /* Standard component islands match Layers: 340px panel plus its 12px left inset. */
+  /* STAMP: 2026-09-28 - Markers uses a wide stage-owned surface while retaining
+   * the same non-blocking, footer-safe component-island behavior. */
   /* Every library/editor uses the same deterministic, non-blocking island
    * geometry. The preset controllers no longer depend on Bootstrap layout. */
   /* STAMP: 2026-09-10 - Override the legacy rule that globally hides modal
@@ -15,10 +17,14 @@ body.cg-modern-theme {
 body.cg-modern-theme.cg-sticker-island-open .cg-workspace, body.cg-modern-theme.cg-object-library-island-open .cg-workspace, body.cg-modern-theme.cg-flip-card-island-open .cg-workspace, body.cg-modern-theme.cg-tree-nodes-island-open .cg-workspace {
   --cg-left-island-reserve: 352px;
 }
+body.cg-modern-theme.cg-marker-island-open .cg-workspace {
+  --cg-left-island-reserve: 872px;
+}
 body.cg-modern-theme #cgStickerModal.cg-sticker-modal,
 body.cg-modern-theme #cgObjectLibrary,
 body.cg-modern-theme #flipRevealPresetModal.cg-left-component-island,
-body.cg-modern-theme #treeNodesPresetModal.cg-left-component-island {
+body.cg-modern-theme #treeNodesPresetModal.cg-left-component-island,
+body.cg-modern-theme #modalmarkers.cg-left-component-island {
   position: fixed !important;
   inset: 12px auto 70px 12px !important;
   z-index: 1260 !important;
@@ -35,13 +41,15 @@ body.cg-modern-theme #treeNodesPresetModal.cg-left-component-island {
 body.cg-modern-theme #cgStickerModal[hidden],
 body.cg-modern-theme #cgObjectLibrary[hidden],
 body.cg-modern-theme #flipRevealPresetModal[hidden],
-body.cg-modern-theme #treeNodesPresetModal[hidden] {
+body.cg-modern-theme #treeNodesPresetModal[hidden],
+body.cg-modern-theme #modalmarkers[hidden] {
   display: none !important;
 }
 body.cg-modern-theme #cgStickerModal .modal-dialog,
 body.cg-modern-theme #cgObjectLibrary .cg-object-library__dialog,
 body.cg-modern-theme #flipRevealPresetModal .modal-dialog,
-body.cg-modern-theme #treeNodesPresetModal .modal-dialog {
+body.cg-modern-theme #treeNodesPresetModal .modal-dialog,
+body.cg-modern-theme #modalmarkers .modal-dialog {
   display: flex;
   width: 100% !important;
   max-width: none !important;
@@ -55,13 +63,15 @@ body.cg-modern-theme #treeNodesPresetModal .modal-dialog {
 body.cg-modern-theme #cgStickerModal .modal-dialog::before,
 body.cg-modern-theme #cgObjectLibrary .cg-object-library__dialog::before,
 body.cg-modern-theme #flipRevealPresetModal .modal-dialog::before,
-body.cg-modern-theme #treeNodesPresetModal .modal-dialog::before {
+body.cg-modern-theme #treeNodesPresetModal .modal-dialog::before,
+body.cg-modern-theme #modalmarkers .modal-dialog::before {
   display: none !important;
 }
 body.cg-modern-theme #cgStickerModal .modal-content,
 body.cg-modern-theme #cgObjectLibrary .cg-object-library__content,
 body.cg-modern-theme #flipRevealPresetModal .modal-content,
-body.cg-modern-theme #treeNodesPresetModal .modal-content {
+body.cg-modern-theme #treeNodesPresetModal .modal-content,
+body.cg-modern-theme #modalmarkers .modal-content {
   display: flex;
   height: 100% !important;
   min-height: 0 !important;
@@ -75,7 +85,8 @@ body.cg-modern-theme #treeNodesPresetModal .modal-content {
 body.cg-modern-theme #cgStickerModal .cg-sticker-modal__body,
 body.cg-modern-theme #cgObjectLibrary .cg-object-library__body,
 body.cg-modern-theme #flipRevealPresetModal .modal-body,
-body.cg-modern-theme #treeNodesPresetModal .modal-body {
+body.cg-modern-theme #treeNodesPresetModal .modal-body,
+body.cg-modern-theme #modalmarkers .modal-body {
   min-height: 0 !important;
   flex: 1 1 auto;
   overflow-x: hidden;
@@ -97,7 +108,10 @@ body.cg-modern-theme #flipRevealPresetModal .modal-body,
 body.cg-modern-theme #flipRevealPresetModal .modal-footer,
 body.cg-modern-theme #treeNodesPresetModal .modal-header,
 body.cg-modern-theme #treeNodesPresetModal .modal-body,
-body.cg-modern-theme #treeNodesPresetModal .modal-footer {
+body.cg-modern-theme #treeNodesPresetModal .modal-footer,
+body.cg-modern-theme #modalmarkers .modal-header,
+body.cg-modern-theme #modalmarkers .modal-body,
+body.cg-modern-theme #modalmarkers .modal-footer {
   background: #fff !important;
   border-color: #e5e7eb !important;
 }
@@ -106,32 +120,47 @@ body.cg-modern-theme #flipRevealPresetModal label,
 body.cg-modern-theme #flipRevealPresetModal strong,
 body.cg-modern-theme #treeNodesPresetModal .modal-title,
 body.cg-modern-theme #treeNodesPresetModal label,
-body.cg-modern-theme #treeNodesPresetModal strong {
+body.cg-modern-theme #treeNodesPresetModal strong,
+body.cg-modern-theme #modalmarkers .modal-title,
+body.cg-modern-theme #modalmarkers label,
+body.cg-modern-theme #modalmarkers strong {
   color: #202124 !important;
 }
 body.cg-modern-theme #flipRevealPresetModal textarea,
 body.cg-modern-theme #flipRevealPresetModal input:not([type=color]),
 body.cg-modern-theme #treeNodesPresetModal textarea,
-body.cg-modern-theme #treeNodesPresetModal input:not([type=color]) {
+body.cg-modern-theme #treeNodesPresetModal input:not([type=color]),
+body.cg-modern-theme #modalmarkers textarea,
+body.cg-modern-theme #modalmarkers input:not([type=color]) {
   border-color: #cfd8e6 !important;
   background: #fff !important;
   color: #202124 !important;
 }
 body.cg-modern-theme #flipRevealPresetModal .cg-flip-preset__copy-grid,
-body.cg-modern-theme #treeNodesPresetModal .cg-flip-preset__copy-grid {
+body.cg-modern-theme #treeNodesPresetModal .cg-flip-preset__copy-grid,
+body.cg-modern-theme #modalmarkers .cg-flip-preset__copy-grid {
   grid-template-columns: minmax(0, 1fr);
 }
 body.cg-modern-theme #flipRevealPresetModal .cg-flip-preset__property-grid,
 body.cg-modern-theme #flipRevealPresetModal .cg-tree-preset__property-grid,
 body.cg-modern-theme #treeNodesPresetModal .cg-flip-preset__property-grid,
-body.cg-modern-theme #treeNodesPresetModal .cg-tree-preset__property-grid {
+body.cg-modern-theme #treeNodesPresetModal .cg-tree-preset__property-grid,
+body.cg-modern-theme #modalmarkers .cg-flip-preset__property-grid,
+body.cg-modern-theme #modalmarkers .cg-tree-preset__property-grid {
   grid-template-columns: minmax(0, 1fr);
 }
 body.cg-modern-theme #flipRevealPresetModal .modal-footer .btn-outline-light,
-body.cg-modern-theme #treeNodesPresetModal .modal-footer .btn-outline-light {
+body.cg-modern-theme #treeNodesPresetModal .modal-footer .btn-outline-light,
+body.cg-modern-theme #modalmarkers .modal-footer .btn-outline-light {
   border-color: #c8d0da !important;
   background: #fff !important;
   color: #202124 !important;
+}
+body.cg-modern-theme #modalmarkers.cg-left-component-island {
+  position: absolute !important;
+  inset: 12px auto 70px 12px !important;
+  width: 860px !important;
+  max-width: calc(100% - 24px) !important;
 }
 body.cg-modern-theme .cg-left-component-island .modal-header .btn-close,
 body.cg-modern-theme #cgStickerModal .cg-sticker-modal__close {
@@ -159,11 +188,17 @@ body.cg-modern-theme .cg-left-component-island .modal-header .btn-close::before 
   line-height: 1 !important;
 }
 
+@media (max-width: 920px) {
+  body.cg-modern-theme.cg-marker-island-open .cg-workspace {
+    --cg-left-island-reserve: 0px;
+  }
+}
 @media (max-width: 720px) {
   body.cg-modern-theme #cgStickerModal.cg-sticker-modal,
 body.cg-modern-theme #cgObjectLibrary,
 body.cg-modern-theme #flipRevealPresetModal.cg-left-component-island,
-body.cg-modern-theme #treeNodesPresetModal.cg-left-component-island {
+body.cg-modern-theme #treeNodesPresetModal.cg-left-component-island,
+body.cg-modern-theme #modalmarkers.cg-left-component-island {
     width: calc(100vw - 24px) !important;
   }
 }

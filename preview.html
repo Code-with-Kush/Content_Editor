@@ -9,7 +9,7 @@
          reuse the same font source as the editor so preview text renders with
          the exported families already supported by the content generator. -->
     <link href="./css/Fonts.css" type="text/css" rel="stylesheet" media="screen" />
-    <link rel="stylesheet" href="./css/preview-content-modal-shared.css?v=20260827-3" />
+    <link rel="stylesheet" href="./css/preview-content-modal-shared.css?v=20260920-loader-983x442" />
 </head>
 
 <body class="preview-content-standalone learner-course-shell">
@@ -144,7 +144,7 @@
     </div>
 
     <!-- main.js contains the runtime used to render the stored slide JSON. -->
-    <script src="../Content/main.js?v=20260911-font-runtime-3"></script>
+    <script src="../Content/main.js?v=20261001-object-effects-16"></script>
     <script>
         (function () {
             var previewAudioSrc = "";
@@ -349,6 +349,8 @@
             if (typeof window.updateAudioPAFV !== "function") {
                 window.updateAudioPAFV = function (pafv) {
                     previewAudioPafv = Number(pafv) || 0;
+                    // STAMP: 2026-09-16 - Pause suppressed revisits without relying on a new canplay event.
+                    if (previewAudioPafv === 1) document.getElementById("previewAudioPlayer")?.pause();
                 };
             }
 

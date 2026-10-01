@@ -6,6 +6,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fabric JS - Content Generator</title>
+  <!-- STAMP: 2026-09-16 - Resolve the favicon when this editor is served directly. -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
@@ -14,12 +16,16 @@
   <link href="css/custom_layout.css?v=20260904-01" type="text/css" rel="stylesheet" media="screen" />
   <!-- STAMP: 2026-09-09 - Refresh selection recovery and reference alignment controls. -->
   <link href="css/content-generator-modern.css?v=20260912-01" type="text/css" rel="stylesheet" media="screen" />
-  <link href="css/quick-action-dropdown.css?v=20260914-03" type="text/css" rel="stylesheet" media="screen" />
-  <link href="css/slide-island.css?v=20260914-02" type="text/css" rel="stylesheet" media="screen" />
+  <link href="css/quick-action-dropdown.css?v=20260929-context-submenus-09" type="text/css" rel="stylesheet" media="screen" />
+  <!-- STAMP: 2026-10-01 - Shared object Effects modal and preset previews. -->
+  <link href="css/object-effects.css?v=20261001-editor-feedback-17" type="text/css" rel="stylesheet" media="screen" />
+  <link href="css/slide-island.css?v=20260914-04" type="text/css" rel="stylesheet" media="screen" />
   <!-- STAMP: 2026-09-10 - Data-driven full-screen Canvas Tutorial and guided spotlight. -->
   <link href="css/canvas-tutorial.css?v=20260910-02" type="text/css" rel="stylesheet" media="screen" />
   <!-- STAMP: 2026-09-10 - Strict footer-safe islands for all Interactive Components. -->
-  <link href="css/library-islands.css?v=20260910-04" type="text/css" rel="stylesheet" media="screen" />
+  <link href="css/library-islands.css?v=20260928-markers-03" type="text/css" rel="stylesheet" media="screen" />
+  <!-- STAMP: 2026-09-28 - Stage-owned marker builder with pinned top-right close control. -->
+  <link href="css/marker-component.css?v=20260928-05" type="text/css" rel="stylesheet" media="screen" />
   <!-- STAMP: 2026-09-09 - Compact account Object Library / SVG modal. -->
   <link href="css/object-library.css?v=20260909-01" type="text/css" rel="stylesheet" media="screen" />
   <!-- STAMP: 2026-09-09 - Shared drag-and-drop surface for canvas file uploaders. -->
@@ -270,7 +276,7 @@
           <!-- STAMP: 2026-08-25 - One-click native rich text insertion replaces
                the Heading/Paragraph/List/Markers choice menu. -->
           <button class="btn btn-sm btn-outline-light cg-header-dropdown-toggle text-white" type="button"
-            id="addDirectText" title="Add text" aria-label="Add editable text">
+            id="addDirectText" title="Add text" aria-label="Add editable text" aria-pressed="false">
             <i class="fa fa-text-width text-white" aria-hidden="true"></i>
           </button>
         </div>
@@ -306,6 +312,15 @@
                   <span class="cg-component-menu__icon cg-component-menu__icon--stickers"><i class="fa fa-star-o"
                       aria-hidden="true"></i></span>
                   <span><strong>Stickers</strong><small>Hand-drawn SVG libraries</small></span>
+                </button>
+              </li>
+              <!-- STAMP: 2026-09-26 - Opens the reusable marker configuration and live preview island. -->
+              <li>
+                <button id="addMarkersComponent" class="dropdown-item cg-component-menu__item" type="button"
+                  data-bs-toggle="modal" data-bs-target="#modalmarkers">
+                  <span class="cg-component-menu__icon cg-component-menu__icon--markers"><i class="fa fa-map-marker"
+                      aria-hidden="true"></i></span>
+                  <span><strong>Markers</strong><small>Build styled marker sets</small></span>
                 </button>
               </li>
               <!-- STAMP: 2026-09-05 - Reuse the account library from Components, matching adjacent menu items. -->
@@ -1978,7 +1993,13 @@
             <!-- STAMP: 2026-09-07 - Compact choices retain the existing persistence control. -->
             <select id="ObjectAnimationEffect" hidden aria-hidden="true" tabindex="-1"></select>
             <div id="ObjectAnimationOptions" class="cg-animation-options" role="radiogroup" aria-label="Object animation"></div>
-            <span class="cg-object-automation__status" id="ObjectAnimationStatus" role="status"></span>
+            <div class="cg-object-automation__button-row d-flex align-items-center justify-content-end gap-2 mt-2">
+              <span class="cg-object-automation__status" id="ObjectAnimationStatus" role="status"></span>
+              <!-- STAMP: 2026-09-20 - Explicitly remove already-applied animations for the active object/group/selection. -->
+              <button type="button" id="RemoveObjectAnimation" class="btn btn-outline-danger btn-sm" hidden>
+                <i class="fa fa-times" aria-hidden="true"></i> Remove Animation
+              </button>
+            </div>
           </div>
         </section>
         <section class="cg-object-automation__item col-12 col-lg-6">
@@ -1988,6 +2009,13 @@
           <div class="cg-object-automation__content" data-object-automation-panel="action" hidden>
             <select class="form-select" id="ObjectActionType"></select>
             <div id="ObjectActionFields"></div>
+            <div class="cg-object-automation__button-row d-flex align-items-center justify-content-end gap-2 mt-2">
+              <span class="cg-object-automation__status" id="ObjectActionStatus" role="status"></span>
+              <!-- STAMP: 2026-09-20 - Explicitly remove all applied actions owned by the active object/group/selection. -->
+              <button type="button" id="RemoveObjectActions" class="btn btn-outline-danger btn-sm" hidden>
+                <i class="fa fa-times" aria-hidden="true"></i> Remove Actions
+              </button>
+            </div>
           </div>
         </section>
       </div>
@@ -2052,10 +2080,14 @@
           <div class="cg-color-popup__stroke-width-extents"><span>0</span><span>50</span></div>
         </div>
 
-        <!-- STAMP: 2026-08-28 - FigJam-inspired two-row palette. Existing
+        <!-- STAMP: 2026-09-15 - Keep one concise primary colour row; the
+             redundant pale/white second row was removed. Existing
              fr-select-color hooks remain authoritative for applying colours. -->
         <div class="fr-color-set fr-text-color fr-selected-set" id="primaryColors">
           <div class="cg-color-popup__swatches">
+            <!-- STAMP: 2026-09-16 - White first, black second; other colours retain their order. -->
+            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-11" role="button"
+              title="#FFFFFF" aria-label="Color #FFFFFF"></span>
             <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-01" role="button"
               title="#1E1E1E" aria-label="Color #1E1E1E"></span>
             <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-02" role="button"
@@ -2076,32 +2108,6 @@
               title="#965DDE" aria-label="Color #965DDE"></span>
             <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-10" role="button"
               title="#E64BAD" aria-label="Color #E64BAD"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-11" role="button"
-              title="#FFFFFF" aria-label="Color #FFFFFF"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-selected" role="button"
-              title="#FFFFFF" aria-label="Selected color #FFFFFF"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-12" role="button"
-              title="#B3B3B3" aria-label="Color #B3B3B3"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-13" role="button"
-              title="#D9D9D9" aria-label="Color #D9D9D9"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-14" role="button"
-              title="#FFB8B8" aria-label="Color #FFB8B8"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-15" role="button"
-              title="#FFE0CC" aria-label="Color #FFE0CC"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-16" role="button"
-              title="#FFF0C2" aria-label="Color #FFF0C2"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-17" role="button"
-              title="#C8F2D4" aria-label="Color #C8F2D4"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-18" role="button"
-              title="#C9F3EF" aria-label="Color #C9F3EF"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-19" role="button"
-              title="#C9E8FA" aria-label="Color #C9E8FA"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-20" role="button"
-              title="#DCCAF5" aria-label="Color #DCCAF5"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-21" role="button"
-              title="#F5C8E7" aria-label="Color #F5C8E7"></span>
-            <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--figma-22" role="button"
-              title="#FFFFFF" aria-label="Color #FFFFFF"></span>
             <button type="button" class="cg-color-swatch cg-color-swatch--custom" aria-label="Open custom color picker"
               title="Custom colour"></button>
             <span class="fr-command fr-select-color cg-color-swatch cg-color-swatch--clear" data-cmd="textColor"
@@ -2109,6 +2115,30 @@
                 aria-hidden="true"></i></span>
           </div>
         </div>
+
+        <!-- STAMP: 2026-09-16 - Shared native Fabric gradient editor; draft changes
+             affect only the preview until Apply gradient is explicitly chosen. -->
+        <section id="cgGradientSelector" class="cg-gradient" hidden aria-label="Gradient paint">
+          <div class="cg-gradient__tabs" role="group" aria-label="Paint type">
+            <button type="button" id="cgSolidPaint" aria-pressed="true">Solid</button>
+            <button type="button" id="cgGradientPaint" aria-pressed="false">Gradient</button>
+          </div>
+          <div id="cgGradientEditor" hidden>
+            <canvas id="cgGradientPreview" width="560" height="100" aria-label="Gradient preview"></canvas>
+            <div class="cg-gradient__controls">
+              <label>Type<select id="cgGradientType"><option value="linear">Linear</option><option value="radial">Radial</option></select></label>
+              <label id="cgGradientAngleLabel">Angle<input id="cgGradientAngle" type="number" min="0" max="360" value="0" /></label>
+              <button type="button" id="cgGradientReverse">Reverse</button>
+            </div>
+            <div class="cg-gradient__stop-head" aria-hidden="true"><span>Colour</span><span>Position %</span><span>Opacity %</span><span></span></div>
+            <div id="cgGradientStops" class="cg-gradient__stops" aria-label="Colour stops"></div>
+            <div class="cg-gradient__actions">
+              <button type="button" id="cgGradientAddStop">+ Add stop</button>
+              <button type="button" id="cgGradientApply">Apply gradient</button>
+            </div>
+            <p class="cg-gradient__hint">Edit colours and positions, then apply. Solid swatches replace the gradient.</p>
+          </div>
+        </section>
 
         <!-- User-saved swatches that persist commonly reused colors for faster reapplication. -->
         <div class="fr-color-set fr-text-color fr-selected-set">
@@ -2380,14 +2410,6 @@
             <div class="modal-body text-center">
               <p class="mb-3">Are you sure you want to delete the selected object? This will
                 also remove any actions linked to it.</p>
-              <!-- STAMP: 2026-08-29 - Optional persisted bypass for future object deletions. -->
-              <label class="cg-delete-confirmation-option" for="skipObjectDeleteConfirmation">
-                <span>Don't ask again</span>
-                <span class="cg-switch">
-                  <input type="checkbox" id="skipObjectDeleteConfirmation">
-                  <span class="cg-switch__track"><span class="cg-switch__thumb"></span></span>
-                </span>
-              </label>
             </div>
             <div class="modal-footer justify-content-center py-2">
               <button type="button" class="btn btn-danger" id="confirmDeleteObject">
@@ -2396,6 +2418,79 @@
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAMP: 2026-09-29 - Confirm destructive object automation removal. -->
+      <div class="modal fade" id="removeObjectAutomationModal" tabindex="-1"
+        aria-labelledby="removeObjectAutomationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+          <div class="modal-content">
+            <button type="button" class="cg-delete-modal-close" data-bs-dismiss="modal" aria-label="Close">
+              <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+            <div class="modal-header py-2">
+              <h6 class="modal-title" id="removeObjectAutomationModalLabel">Remove automation?</h6>
+            </div>
+            <div class="modal-body text-center">
+              <p id="removeObjectAutomationMessage" class="mb-0"></p>
+            </div>
+            <div class="modal-footer justify-content-center py-2">
+              <button type="button" class="btn btn-danger" id="confirmRemoveObjectAutomation">Remove</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAMP: 2026-10-01 - Persisted interaction details and shared Effects entry point opened from Layers. -->
+      <div class="modal fade cg-layer-details-modal" id="layerAutomationDetailsModal" tabindex="-1"
+        aria-labelledby="layerAutomationDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div>
+                <small class="cg-layer-details-modal__eyebrow">Layer details</small>
+                <h5 class="modal-title" id="layerAutomationDetailsModalLabel">Object automation</h5>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="layerAutomationDetailsBody"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAMP: 2026-10-01 - One extensible Effects surface is shared by toolbar, context menu, and Layers. -->
+      <div class="modal fade" id="cgEffectsModal" tabindex="-1" aria-labelledby="cgEffectsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content cg-effects-modal">
+            <div class="modal-header">
+              <div><small class="cg-effects-modal__eyebrow">Object interaction</small><h5 class="modal-title" id="cgEffectsModalLabel">Effects</h5></div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body cg-effects-modal__body">
+              <nav class="cg-effects-categories" aria-label="Effect categories">
+                <button type="button" class="is-active" aria-current="page"><i class="fa fa-hand-pointer-o" aria-hidden="true"></i> Hover</button>
+              </nav>
+              <section class="cg-effects-workspace" aria-label="Hover effects">
+                <div><span class="cg-effects-modal__eyebrow">Hover presets</span><p>Choose how the object responds when a learner points to it.</p></div>
+                <div class="cg-effects-preview" id="cgEffectsPreview" aria-live="polite">
+                  <div class="cg-effects-preview__heading"><span><small>LIVE PREVIEW</small><strong id="cgEffectsPreviewName">Selected object</strong></span><span>Hover to replay</span></div>
+                  <div class="cg-effects-preview__stage"><img id="cgEffectsPreviewImage" alt="Preview of the selected object effect" /></div>
+                </div>
+                <div class="cg-effects-preset-grid" id="cgEffectsPresetGrid"></div>
+                <div class="cg-effects-settings" id="cgEffectsSettings"></div>
+              </section>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger me-auto" id="cgRemoveEffect" hidden><i class="fa fa-times" aria-hidden="true"></i> Remove Effect</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="cgApplyEffect">Apply Effect</button>
             </div>
           </div>
         </div>
@@ -2606,60 +2701,121 @@
         </div>
       </div>
 
-      <!-- Marker generator modal for inserting repeated status symbols or a custom one-character marker set. -->
-      <div class="modal fade" id="modalmarkers" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered cg-marker-modal__dialog">
-          <div class="modal-content cg-marker-modal">
-            <div class="modal-header cg-marker-modal__header">
-              <div class="cg-marker-modal__heading">
-                <span class="cg-marker-modal__eyebrow">Symbol Set</span>
-                <h5 class="modal-title" id="modalTitle">Add Markers</h5>
-                <p class="cg-marker-modal__subtitle">
-                  Pick a preset marker or define a custom single-character marker.
-                </p>
+      <!-- STAMP: 2026-09-26 - Structured marker configuration feeds one grouped Fabric insertion. -->
+      <div class="modal fade" id="modalmarkers" tabindex="-1" aria-labelledby="markerBuilderTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered cg-marker-builder__dialog">
+          <div class="modal-content cg-marker-builder">
+            <div class="modal-header cg-marker-builder__header">
+              <div>
+                <span class="cg-marker-builder__eyebrow">Interactive component</span>
+                <h5 class="modal-title" id="markerBuilderTitle">Markers</h5>
+                <p>Configure a reusable marker set and preview every change.</p>
               </div>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close markers"></button>
             </div>
-            <div class="modal-body cg-marker-modal__body">
-              <table class="wd100 cg-marker-modal__table" id="tblmarkers">
-                <tr>
-                  <td><a class="amarker">+</a></td>
-                  <td><a class="amarker">-</a></td>
-                  <td><a class="amarker">?</a></td>
-                  <td><a class="amarker">✔</a></td>
-                </tr>
-                <tr>
-                  <td><a class="amarker">►</a></td>
-                  <td><a class="amarker">◄</a></td>
-                  <td><a class="amarker">▲</a></td>
-                  <td><a class="amarker">▼</a></td>
-                </tr>
+            <div class="modal-body cg-marker-builder__body">
+              <form id="markerBuilderForm" class="cg-marker-builder__form" novalidate>
+                <fieldset class="cg-marker-builder__section">
+                  <legend>Shape</legend>
+                  <label class="cg-marker-builder__field cg-marker-builder__field--wide">
+                    <span>Shape</span>
+                    <select id="markerShape" class="form-select">
+                      <option value="rectangle">Rectangle</option>
+                      <option value="square">Square</option>
+                      <option value="circle">Circle</option>
+                      <option value="octagon">Octagon</option>
+                      <option value="hexagon">Hexagon</option>
+                    </select>
+                  </label>
+                  <div class="cg-marker-builder__grid">
+                    <label class="cg-marker-builder__field">
+                      <span>Fill color</span>
+                      <span class="cg-marker-builder__color"><input id="markerFillColor" type="color"
+                          value="#2563eb" /><output for="markerFillColor">#2563EB</output></span>
+                    </label>
+                    <label class="cg-marker-builder__field">
+                      <span>Stroke color</span>
+                      <span class="cg-marker-builder__color"><input id="markerStrokeColor" type="color"
+                          value="#1e3a8a" /><output for="markerStrokeColor">#1E3A8A</output></span>
+                    </label>
+                    <label class="cg-marker-builder__field">
+                      <span>Stroke width</span>
+                      <span class="cg-marker-builder__number"><input id="markerStrokeWidth" type="number" min="0"
+                          max="12" step="1" value="2" /><span>px</span></span>
+                    </label>
+                    <label class="cg-marker-builder__field" id="markerCornerRadiusField">
+                      <span>Corner radius</span>
+                      <span class="cg-marker-builder__number"><input id="markerCornerRadius" type="number" min="0"
+                          max="36" step="1" value="8" /><span>px</span></span>
+                    </label>
+                    <label class="cg-marker-builder__field cg-marker-builder__field--wide">
+                      <span>Shape size</span>
+                      <span class="cg-marker-builder__range"><input id="markerSize" type="range" min="40" max="120"
+                          step="2" value="72" /><output for="markerSize">72 px</output></span>
+                    </label>
+                  </div>
+                </fieldset>
 
-                <tr>
-                  <td><a class="amarker">i</a></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td colspan="4">
-                    <div class="form-group">
-                      <label>Custom Marker</label><br />
-                      <input type="text" spellcheck="{true}" maxlength="1" class="form-control" id="txtcustmarkers" />
+                <fieldset class="cg-marker-builder__section">
+                  <legend>Numbers</legend>
+                  <label class="cg-marker-builder__toggle" for="markerUseNumbers">
+                    <span><strong>Use numbers</strong><small>Label markers sequentially from 1.</small></span>
+                    <input id="markerUseNumbers" type="checkbox" role="switch" />
+                    <i aria-hidden="true"></i>
+                  </label>
+                  <div id="markerNumberSettings" class="cg-marker-builder__number-settings" hidden>
+                    <label class="cg-marker-builder__field cg-marker-builder__field--wide" id="markerNumberLimitField">
+                      <span>Number limit</span>
+                      <input id="markerNumberLimit" type="number" min="1" max="50" step="1" value="5" />
+                      <small>Generate between 1 and 50 numbered markers.</small>
+                    </label>
+                    <div class="cg-marker-builder__grid">
+                      <label class="cg-marker-builder__field">
+                        <span>Text color</span>
+                        <span class="cg-marker-builder__color"><input id="markerTextColor" type="color"
+                            value="#ffffff" /><output for="markerTextColor">#FFFFFF</output></span>
+                      </label>
+                      <label class="cg-marker-builder__field">
+                        <span>Font family</span>
+                        <select id="markerFontFamily">
+                          <option value="Arial">Arial</option>
+                          <option value="Verdana">Verdana</option>
+                          <option value="Tahoma">Tahoma</option>
+                          <option value="Georgia">Georgia</option>
+                          <option value="Times New Roman">Times New Roman</option>
+                        </select>
+                      </label>
+                      <label class="cg-marker-builder__field">
+                        <span>Font size</span>
+                        <span class="cg-marker-builder__number"><input id="markerFontSize" type="number" min="10"
+                            max="48" step="1" value="22" /><span>px</span></span>
+                      </label>
+                      <label class="cg-marker-builder__field">
+                        <span>Font weight</span>
+                        <select id="markerFontWeight">
+                          <option value="400">Regular</option>
+                          <option value="500">Medium</option>
+                          <option value="600">Semi bold</option>
+                          <option value="700" selected>Bold</option>
+                        </select>
+                      </label>
                     </div>
-                    <div class="form-group">
-                      <label>No. of Marker</label><br />
-                      <input type="number" min="1" max="50" value="1" class="form-control" id="txtnoofmarkers" />
-                    </div>
-                  </td>
-                </tr>
-              </table>
+                  </div>
+                </fieldset>
+              </form>
+
+              <section class="cg-marker-preview" aria-labelledby="markerPreviewTitle">
+                <div class="cg-marker-preview__header">
+                  <div><span>Live preview</span><strong id="markerPreviewTitle">Marker set</strong></div>
+                  <output id="markerPreviewCount">1 marker</output>
+                </div>
+                <div id="markerPreview" class="cg-marker-preview__canvas" aria-live="polite"></div>
+              </section>
+              <p id="markerBuilderStatus" class="cg-marker-builder__status" role="status" hidden></p>
             </div>
-            <div class="modal-footer cg-marker-modal__footer">
-              <a id="addcustmarkers" class="btn btn-success cg-marker-modal__primary">Add</a>
-              <button type="button" class="btn btn-danger cg-marker-modal__secondary" data-bs-dismiss="modal">
-                Close
-              </button>
+            <div class="modal-footer cg-marker-builder__footer">
+              <button type="button" class="btn btn-outline-secondary" id="resetMarkerConfiguration">Reset</button>
+              <button type="button" class="btn btn-primary" id="addMarkerToCanvas">Add to canvas</button>
             </div>
           </div>
         </div>
@@ -3279,6 +3435,14 @@
             </div>
             <div class="modal-body">
               <div class="cg-slide-media-modal__preview" id="slideMediaPreview"></div>
+              <!-- STAMP: 2026-09-16 - Opt-in, slide-scoped first-visit audio playback. -->
+              <div id="slideAudioFirstVisitOption" class="cg-slide-audio-first-visit" hidden>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="chkplayonce" role="switch" aria-describedby="slideAudioFirstVisitHelp" />
+                  <label class="form-check-label" for="chkplayonce">Play audio only on first visit</label>
+                </div>
+                <small id="slideAudioFirstVisitHelp">Prevent automatic replay when returning to this slide during the same viewing session.</small>
+              </div>
               <!-- STAMP: 2026-08-31 - Local, opt-in audio optimization before upload. -->
               <section class="cg-audio-optimizer" id="slideAudioOptimizer" aria-labelledby="slideAudioOptimizerTitle"
                 hidden>
@@ -3612,6 +3776,8 @@
               <div class="cg-json-editor__tools">
                 <button type="button" id="formatJsonData"><i class="fa fa-indent"></i> Format</button>
                 <button type="button" id="copyJsonData"><i class="fa fa-copy"></i> Copy</button>
+                <!-- STAMP: 2026-09-21 - Remove generated raster previews from the JSON draft. -->
+                <button type="button" id="removeJsonImgprev"><i class="fa fa-trash" aria-hidden="true"></i> Remove imgprev</button>
                 <!-- STAMP: 2026-08-13 - Keep editor completion actions beside the code tools as requested. -->
                 <button type="button" class="cg-json-editor__tool-icon cg-json-editor__tool-icon--cancel"
                   data-bs-dismiss="modal" title="Cancel" aria-label="Cancel JSON changes">
@@ -3649,9 +3815,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-minicolors/2.3.6/jquery.minicolors.min.js"></script>
   <script type="text/javascript" src="js/webfont.js"></script>
   <!-- STAMP: 2026-09-11 - Shared editor/preview font catalog and loader. -->
-  <script type="text/javascript" src="js/font-runtime.js?v=20260911-02"></script>
+  <script type="text/javascript" src="js/font-runtime.js?v=20260921-font-cache"></script>
   <script type="text/javascript" src="js/fabric.js?v=7.4.0"></script>
   <script type="text/javascript" src="js/fabric-v7-compat.js?v=20260818-1"></script>
+  <!-- STAMP: 2026-10-01 - Shared success/error feedback for editor actions. -->
+  <script type="text/javascript" src="js/editor-feedback.js?v=20261001-editor-feedback-01"></script>
+  <script type="text/javascript" src="js/object-effects.js?v=20261001-object-effects-16"></script>
+  <!-- STAMP: 2026-09-16 - Shared editable text-list registry and formatting. -->
+  <script type="text/javascript" src="js/text-list-formatting.js?v=20260916-12"></script>
   <!-- STAMP: 2026-09-05 - Canvas/SVG marker highlights retain native text editing. -->
   <script type="text/javascript" src="js/text-highlight-pattern.js?v=20260905-11"></script>
   <!-- STAMP: 2026-08-25 - Modular LMS widget registry and compact editor panels. -->
@@ -3669,26 +3840,29 @@
   <script type="text/javascript" src="js/input-security.js?v=20260813-2"></script>
   <!-- STAMP: 2026-08-18 - Cache-bust ActiveSelection Quick Controls enhancements. -->
   <!-- STAMP: 2026-08-21 - Load the current individual-object inspector implementation. -->
-  <script type="text/javascript" src="js/content-generator-ui.js?v=20260914-03"></script>
+  <script type="text/javascript" src="js/content-generator-ui.js?v=20261001-editor-feedback-17"></script>
   <!-- STAMP: 2026-09-14 - Shared registry for general/text keyboard commands and tutorial labels. -->
-  <script type="text/javascript" src="js/text-shortcuts.js?v=20260914-03"></script>
-  <script type="text/javascript" src="js/canvas-tutorial.js?v=20260914-03"></script>
+  <script type="text/javascript" src="js/text-shortcuts.js?v=20260916-12"></script>
+  <script type="text/javascript" src="js/canvas-tutorial.js?v=20260916-12"></script>
   <!-- STAMP: 2026-09-11 - Paste into Fabric text without importing external formatting. -->
-  <script type="text/javascript" src="js/rich-text-component.js?v=20260911-03"></script>
-  <script type="text/javascript" src="js/json-data-editor.js?v=20260813-2"></script>
+  <script type="text/javascript" src="js/rich-text-component.js?v=20260915-05"></script>
+  <script type="text/javascript" src="js/json-data-editor.js?v=20260921-object-automation"></script>
   <script type="text/javascript" src="js/intelligent-content-generator.js?v=20260904-2"></script>
   <script type="text/javascript" src="js/tree-nodes-component.js?v=20260910-3"></script>
+  <script type="text/javascript" src="js/marker-component.js?v=20260928-05"></script>
   <script type="text/javascript" src="js/component-save-bridge.js?v=20260819-1"></script>
   <script type="text/javascript" src="js/component-revival.js?v=20260819-1"></script>
   <script type="text/javascript" src="js/components/object-library.js?v=20260910-3"></script>
   <script type="text/javascript" src="js/components/file-dropzone.js?v=20260909-1"></script>
+  <!-- STAMP: 2026-09-16 - Preserve existing widget output at the native controller boundary. -->
+  <script type="text/javascript" src="js/editor-plugin-bridge.js?v=20260916-native-01"></script>
   <!-- Final bootstrap step that cache-busts and injects the main Fabric editor controller. -->
   <script>
     const newScript = document.createElement("script");
     newScript.type = "text/javascript";
     // 2026-09-13: Keep this deployment stamp deterministic so the 1 MB editor
     // runtime is cached between openings. Bump the stamp whenever fabric-main.js changes.
-    newScript.src = "js/fabric-main.js?v=20260914-01";
+    newScript.src = "js/fabric-main.js?v=20261001-editor-feedback-17";
     document.body.appendChild(newScript);
     newScript.addEventListener("load", function () {
       var widgetScript = document.createElement("script");

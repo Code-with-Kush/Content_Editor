@@ -204,6 +204,18 @@
             document.execCommand("copy")
         })
     })
+    // STAMP: 2026-09-21 - Clean the draft only; Apply and Submit retain their existing roles.
+    document.getElementById("removeJsonImgprev").addEventListener("click", function () {
+        const parsed = validateJson(true)
+        if (parsed === null) return
+        editor.value = window.serializeContentData(parsed, 2)
+        clearTimeout(validationTimer)
+        updateLines()
+        updateSearch()
+        updateCursor()
+        validateJson(false)
+        status.querySelector("span").textContent = "imgprev removed — apply to content"
+    })
     applyButton.addEventListener("click", async function () {
         const parsed = validateJson(true)
         if (parsed === null || typeof window.applyJsonEditorContentData !== "function") return

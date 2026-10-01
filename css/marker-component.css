@@ -1,0 +1,372 @@
+/*
+ * FILE: src/assets/scss/custom/ContentGenerator/MarkerComponent.scss
+ * PURPOSE: Compact marker configuration and live-preview island.
+ * STAMP: 2026-09-28
+ * COMPILED TO: public/assets/ContentGenerator/css/marker-component.css
+ */
+body.cg-modern-theme #modalmarkers {
+  --marker-accent: #2563eb;
+  --marker-border: #d9e1ec;
+  --marker-ink: #172033;
+  --marker-muted: #667085;
+  --marker-surface: #f6f8fb;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__dialog {
+  width: 100% !important;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder {
+  overflow: hidden;
+  color: var(--marker-ink);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__header {
+  position: relative;
+  align-items: flex-start;
+  min-height: 94px;
+  padding: 18px 62px 17px 20px;
+  border: 0 !important;
+  background: #172033 !important;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__header > div {
+  min-width: 0;
+  padding-right: 14px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__header .modal-title {
+  margin: 2px 0 3px;
+  color: #fff !important;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__header p {
+  margin: 0;
+  color: #b8c2d4;
+  font-size: 12px;
+  line-height: 1.45;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__header .btn-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  margin: 0 !important;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__eyebrow {
+  display: block;
+  color: #8fb6ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__body {
+  display: grid;
+  grid-template-columns: minmax(0, 390px) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  padding: 16px;
+  background: #eef2f7 !important;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__form {
+  display: grid;
+  gap: 12px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__section {
+  min-width: 0;
+  margin: 0;
+  padding: 15px;
+  border: 1px solid var(--marker-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__section legend {
+  float: none;
+  width: auto;
+  margin: 0 0 12px;
+  padding: 0;
+  color: var(--marker-ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+  margin-top: 11px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  margin: 0;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field > span:first-child {
+  color: #344054;
+  font-size: 11px;
+  font-weight: 700;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field > small {
+  color: var(--marker-muted);
+  font-size: 10px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field input:not([type=color], [type=range]),
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field select {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px;
+  background: #fff !important;
+  color: var(--marker-ink) !important;
+  font-size: 12px;
+  outline: 0;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field input:not([type=color], [type=range]):focus,
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field select:focus {
+  border-color: var(--marker-accent) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field.is-disabled {
+  opacity: 0.48;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field--wide {
+  grid-column: 1/-1;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__color,
+body.cg-modern-theme #modalmarkers .cg-marker-builder__number,
+body.cg-modern-theme #modalmarkers .cg-marker-builder__range {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 9px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__color input[type=color] {
+  width: 28px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__color output {
+  color: #475467;
+  font: 600 11px/1 monospace;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__number input {
+  min-width: 0;
+  min-height: 26px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__number > span:last-child {
+  color: #98a2b3;
+  font-size: 11px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__range input {
+  min-width: 0;
+  flex: 1;
+  accent-color: var(--marker-accent);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__range output {
+  min-width: 40px;
+  color: #475467;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  cursor: pointer;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle > span {
+  display: grid;
+  gap: 2px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle strong {
+  color: var(--marker-ink) !important;
+  font-size: 12px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle small {
+  color: var(--marker-muted);
+  font-size: 10px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle i {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: background-color 0.16s ease;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle i::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.28);
+  content: "";
+  transition: transform 0.16s ease;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle input:checked + i {
+  background: var(--marker-accent);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle input:checked + i::after {
+  transform: translateX(16px);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__toggle input:focus-visible + i {
+  outline: 3px solid rgba(37, 99, 235, 0.2);
+  outline-offset: 2px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__number-settings {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e7ecf3;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__number-settings[hidden] {
+  display: none !important;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview {
+  position: sticky;
+  top: 0;
+  grid-column: 2;
+  grid-row: 1;
+  overflow: hidden;
+  border: 1px solid var(--marker-border);
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid #e7ecf3;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview__header > div {
+  display: grid;
+  gap: 1px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview__header span,
+body.cg-modern-theme #modalmarkers .cg-marker-preview__header output {
+  color: var(--marker-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview__header strong {
+  color: var(--marker-ink) !important;
+  font-size: 13px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview__header output {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #315ea8;
+  letter-spacing: 0;
+  text-transform: none;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview__canvas {
+  display: grid;
+  min-height: 360px;
+  max-height: calc(100vh - 250px);
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  overflow: auto;
+  padding: 16px;
+  background-color: var(--marker-surface);
+  background-image: radial-gradient(#cbd5e1 0.7px, transparent 0.7px);
+  background-size: 12px 12px;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview__item {
+  display: grid;
+  min-height: 104px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.88);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-preview__marker {
+  display: block;
+  max-width: calc(100% - 14px);
+  max-height: 92px;
+  filter: drop-shadow(0 4px 7px rgba(15, 23, 42, 0.14));
+  transition: width 0.16s ease, height 0.16s ease;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--marker-border) !important;
+  background: #fff !important;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__footer .btn {
+  min-height: 36px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__footer .btn-primary {
+  border-color: var(--marker-accent);
+  background: var(--marker-accent);
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__footer .btn-outline-secondary {
+  border-color: #cbd5e1 !important;
+  background: #fff !important;
+  color: #344054 !important;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__status {
+  grid-column: 1/-1;
+  margin: -4px 0 0;
+  padding: 9px 11px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fff1f2;
+  color: #b42318;
+  font-size: 11px;
+  font-weight: 600;
+}
+body.cg-modern-theme #modalmarkers .cg-marker-builder__field[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 920px) {
+  body.cg-modern-theme #modalmarkers .cg-marker-builder__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.cg-modern-theme #modalmarkers .cg-marker-preview {
+    position: static;
+    grid-column: 1;
+    grid-row: auto;
+  }
+  body.cg-modern-theme #modalmarkers .cg-marker-builder__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.cg-modern-theme #modalmarkers .cg-marker-preview__canvas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

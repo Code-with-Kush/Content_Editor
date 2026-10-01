@@ -66,6 +66,9 @@
         return unique(found);
     }
 
+    // STAMP: 2026-09-21 - Reuse successful font sets and share in-flight loads.
+    // Failed loads remain retryable; first-load weights and hydration are preserved.
+    var fontLoads = Object.create(null);
     function load(families, done) {
         var webFonts = unique((families || []).filter(function (font) { return !isSystemFont(font); }));
         var finish = typeof done === "function" ? done : function () {};
@@ -73,10 +76,27 @@
             finish();
             return;
         }
+        var key = webFonts.slice().sort().join('|');
+        if (fontLoads[key] === true) {
+            finish();
+            return;
+        }
+        if (Array.isArray(fontLoads[key])) {
+            fontLoads[key].push(finish);
+            return;
+        }
+        fontLoads[key] = [finish];
+        function settle(loaded) {
+            var callbacks = fontLoads[key];
+            if (!Array.isArray(callbacks)) return;
+            if (loaded) fontLoads[key] = true;
+            else delete fontLoads[key];
+            callbacks.forEach(function (callback) { callback(); });
+        }
         window.WebFont.load({
             google: { families: webFonts.map(function (font) { return font + ":100,200,300,400,500,600,700,800,900"; }) },
-            active: finish,
-            inactive: finish
+            active: function () { settle(true); },
+            inactive: function () { settle(false); }
         });
     }
 

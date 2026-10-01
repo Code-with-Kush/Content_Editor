@@ -1754,10 +1754,12 @@
             dragOffsetX: 0,
             dragOffsetY: 0
         };
-        /* STAMP: 2026-09-12 - One compact, type-safe command menu is shared by
-         * text, images, shapes, groups and ActiveSelection objects. */
+        /* STAMP: 2026-09-29 - One compact, type-safe command menu is shared by
+         * text, images, shapes, groups and ActiveSelection objects, including
+         * the same Animation and Actions panels used by the selection toolbar. */
         const objectContextMenu = createElement("div", "cg-object-command-menu");
         let contextMenuTarget = null;
+        let contextMenuOrigin = null;
         objectContextMenu.hidden = true;
         objectContextMenu.setAttribute("role", "menu");
         objectContextMenu.setAttribute("aria-label", "Object actions");
@@ -1770,7 +1772,11 @@
             + '<div class="cg-object-command-menu__separator" role="separator"></div>'
             + '<div class="cg-object-command-menu__group">'
             + '<button type="button" role="menuitem" data-cg-object-command="properties"><i class="fa fa-sliders" aria-hidden="true"></i><span>Quick controls</span></button>'
+            + '<button type="button" role="menuitem" data-cg-object-command="animation"><i class="fa fa-play-circle" aria-hidden="true"></i><span>Animation</span><i class="fa fa-check cg-object-command-menu__state" aria-label="Animation added" hidden></i></button>'
+             + '<button type="button" role="menuitem" data-cg-object-command="actions"><i class="fa fa-bolt" aria-hidden="true"></i><span>Actions</span><i class="fa fa-check cg-object-command-menu__state" aria-label="Action added" hidden></i></button>'
+             + '<button type="button" role="menuitem" data-cg-object-command="effects"><i class="fa fa-magic" aria-hidden="true"></i><span>Effects</span><i class="fa fa-check cg-object-command-menu__state" aria-label="Effect added" hidden></i></button>'
             + '<button type="button" role="menuitem" data-cg-object-command="export-png"><i class="fa fa-download" aria-hidden="true"></i><span>Export as PNG</span></button></div>'
+            + '<div data-cg-object-toolbar-groups></div>'
             + '<div class="cg-object-command-menu__separator" role="separator"></div>'
             + '<div class="cg-object-command-menu__group">'
             + '<button type="button" role="menuitem" data-cg-object-command="front"><i class="fa fa-angle-double-up" aria-hidden="true"></i><span>Bring to front</span></button>'
@@ -1861,6 +1867,51 @@
                 : (target ? [target] : []);
         }
 
+        function escapeContextMenuText(value) {
+            return String(value || "").replace(/[&<>"']/g, (character) => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            }[character]));
+        }
+
+        function renderObjectToolbarGroups() {
+            const host = objectContextMenu.querySelector("[data-cg-object-toolbar-groups]");
+            const groups = typeof window.CGGetSelectionToolbarActionGroups === "function"
+                ? window.CGGetSelectionToolbarActionGroups()
+                : [];
+            if (!host) return;
+            host.innerHTML = groups.length ? '<div class="cg-object-command-menu__separator" role="separator"></div>'
+                + '<div class="cg-object-command-menu__group cg-object-command-menu__submenus">'
+                + groups.map((group) => '<div class="cg-object-command-submenu">'
+                    + `<button type="button" role="menuitem" class="cg-object-command-submenu__trigger" aria-haspopup="menu" aria-expanded="false"><i class="fa ${escapeContextMenuText(group.icon)}" aria-hidden="true"></i><span>${escapeContextMenuText(group.label)}</span><i class="fa fa-angle-right cg-object-command-submenu__arrow" aria-hidden="true"></i></button>`
+                    + `<div class="cg-object-command-submenu__panel" role="menu" aria-label="${escapeContextMenuText(group.label)}">`
+                    + group.actions.map((action) => `<button type="button" role="menuitem" data-cg-object-toolbar-action="${escapeContextMenuText(action.action)}"${action.disabled ? " disabled" : ""}><i class="fa ${escapeContextMenuText(action.icon)}" aria-hidden="true"></i><span>${escapeContextMenuText(action.label)}</span></button>`).join("")
+                    + '</div></div>').join("") + '</div>'
+                : "";
+        }
+
+        /* STAMP: 2026-09-29 - Keep every nested command panel inside the
+         * visible editor viewport while allowing it to escape the menu box. */
+        function positionObjectCommandSubmenu(submenu) {
+            const panel = submenu?.querySelector(".cg-object-command-submenu__panel");
+            if (!panel) return;
+            const margin = 8;
+            submenu.classList.remove("opens-left");
+            panel.style.top = "-6px";
+            panel.style.maxHeight = `${Math.max(120, window.innerHeight - (margin * 2))}px`;
+            const menuBounds = objectContextMenu.getBoundingClientRect();
+            const panelWidth = panel.getBoundingClientRect().width || 226;
+            submenu.classList.toggle("opens-left", menuBounds.right + panelWidth > window.innerWidth - margin);
+            const panelBounds = panel.getBoundingClientRect();
+            let topOffset = -6;
+            if (panelBounds.bottom > window.innerHeight - margin) {
+                topOffset -= panelBounds.bottom - (window.innerHeight - margin);
+            }
+            if (panelBounds.top + (topOffset + 6) < margin) {
+                topOffset += margin - (panelBounds.top + (topOffset + 6));
+            }
+            panel.style.top = `${topOffset}px`;
+        }
+
         function hideObjectContextMenu(restoreToolbar) {
             if (objectContextMenu.hidden) return;
             objectContextMenu.hidden = true;
@@ -1873,8 +1924,24 @@
             if (!target || !event) return;
             hidePopup();
             contextMenuTarget = target;
+            contextMenuOrigin = { left: event.clientX, top: event.clientY };
             const targetType = String(target.type || "").toLowerCase();
             const targets = contextTargets(target);
+            const targetIds = new Set(targets.map((object) => object && object.id).filter(Boolean));
+            const slide = typeof generated_slides !== "undefined" && Array.isArray(generated_slides)
+                ? generated_slides[typeof slide_index === "number" ? slide_index : -1]
+                : null;
+            const slideJson = slide && slide.jsonobj ? slide.jsonobj : {};
+            const animations = Array.isArray(slide && slide.AnimationSequence) ? slide.AnimationSequence : (Array.isArray(slideJson.animationSequence) ? slideJson.animationSequence : []);
+            const legacyAnimations = Array.isArray(slide && slide.loadActions) ? slide.loadActions : (Array.isArray(slideJson.loadActions) ? slideJson.loadActions : []);
+            const animationControls = Array.isArray(slide && slide.animationOnControls) ? slide.animationOnControls : [];
+            const actions = Array.isArray(slide && slide.actions) ? slide.actions : (Array.isArray(slideJson.actions) ? slideJson.actions : []);
+            const hasAnimation = animations.some((entry) => entry && targetIds.has(entry.objectId) && entry.effect !== "none")
+                || legacyAnimations.some((entry) => entry && targetIds.has(entry.actionOn))
+                || animationControls.some((entry) => entry && targetIds.has(entry.id));
+            const hasActions = actions.some((entry) => entry && targetIds.has(entry.actionFrom));
+            const hasEffects = targets.some((object) => window.CGObjectEffects?.hasEffect(object));
+            renderObjectToolbarGroups();
             const locked = targets.length > 0 && targets.every((object) => (
                 object.lockMovementX && object.lockMovementY && object.lockScalingX
                 && object.lockScalingY && object.lockRotation
@@ -1884,6 +1951,13 @@
             lockControl.querySelector("span").textContent = locked ? "Unlock object" : "Lock object";
             objectContextMenu.querySelector('[data-cg-object-command="group"]').hidden = targetType !== "activeselection";
             objectContextMenu.querySelector('[data-cg-object-command="ungroup"]').hidden = targetType !== "group";
+            objectContextMenu.querySelector('[data-cg-object-command="animation"]').hidden = typeof window.isCurrentSlideAnimationDisabled === "function"
+                && window.isCurrentSlideAnimationDisabled();
+            [["animation", hasAnimation], ["actions", hasActions], ["effects", hasEffects]].forEach(([command, configured]) => {
+                const commandControl = objectContextMenu.querySelector(`[data-cg-object-command="${command}"]`);
+                commandControl.classList.toggle("is-configured", configured);
+                commandControl.querySelector(".cg-object-command-menu__state").hidden = !configured;
+            });
             objectContextMenu.querySelector('[data-cg-object-command="export-png"]').disabled = typeof target.toDataURL !== "function";
             objectContextMenu.hidden = false;
             objectContextMenu.setAttribute("aria-hidden", "false");
@@ -1893,6 +1967,7 @@
             const top = Math.min(Math.max(margin, event.clientY), Math.max(margin, window.innerHeight - bounds.height - margin));
             objectContextMenu.style.left = `${left}px`;
             objectContextMenu.style.top = `${top}px`;
+            objectContextMenu.classList.toggle("opens-left", left + bounds.width + 238 > window.innerWidth - margin);
             window.dispatchEvent(new CustomEvent("cg:object-context-menu-opened"));
             objectContextMenu.querySelector('button:not([hidden]):not(:disabled)')?.focus({ preventScroll: true });
         }
@@ -1904,6 +1979,12 @@
             if (typeof window.updateCanvasState === "function") window.updateCanvasState();
         }
 
+        /* STAMP: 2026-10-01 - Keep context and quick-action feedback aligned
+         * with the editor-wide accessible toaster without duplicating UI. */
+        function showEditorFeedback(type, title, message) {
+            window.CGEditorFeedback?.show({ type, title, message });
+        }
+
         function runLayerCommand(command, target) {
             const targets = contextTargets(target);
             const canvasObjects = state.activeCanvas.getObjects();
@@ -1913,6 +1994,7 @@
             if (command === "backward") targets.forEach((object) => state.activeCanvas.sendObjectBackwards(object));
             if (command === "back") targets.slice().reverse().forEach((object) => state.activeCanvas.sendObjectToBack(object));
             commitContextChange(target);
+            showEditorFeedback("success", "Layer order updated", "The selected object was moved in the canvas stack.");
         }
 
         async function exportContextTarget(target) {
@@ -1923,6 +2005,7 @@
             const blob = await response.blob();
             if (typeof window.saveAs === "function") {
                 window.saveAs(blob, `${safeName}.png`);
+                showEditorFeedback("success", "PNG exported", `${safeName}.png is ready.`);
                 return;
             }
             const objectUrl = URL.createObjectURL(blob);
@@ -1931,6 +2014,7 @@
             link.download = `${safeName}.png`;
             link.click();
             window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+            showEditorFeedback("success", "PNG exported", `${safeName}.png is ready.`);
         }
 
         function triggerSelectionCommand(command) {
@@ -1957,20 +2041,70 @@
                 object.setCoords();
             });
             commitContextChange(target);
+            showEditorFeedback("success", shouldLock ? "Object locked" : "Object unlocked", `${targets.length} selected object${targets.length === 1 ? "" : "s"} updated.`);
         }
 
         objectContextMenu.addEventListener("mousedown", (event) => event.stopPropagation());
+        /* STAMP: 2026-10-01 - The custom object menu and all nested submenus
+         * own right-click interaction; never fall through to the browser menu. */
+        objectContextMenu.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }, true);
+        objectContextMenu.addEventListener("pointerover", (event) => {
+            const submenu = event.target.closest(".cg-object-command-submenu");
+            if (!submenu || !objectContextMenu.contains(submenu)) return;
+            objectContextMenu.querySelectorAll(".cg-object-command-submenu.is-open").forEach((item) => {
+                if (item !== submenu) {
+                    item.classList.remove("is-open");
+                    item.querySelector(".cg-object-command-submenu__trigger")?.setAttribute("aria-expanded", "false");
+                }
+            });
+            submenu.classList.add("is-open");
+            submenu.querySelector(".cg-object-command-submenu__trigger")?.setAttribute("aria-expanded", "true");
+            positionObjectCommandSubmenu(submenu);
+        });
         objectContextMenu.addEventListener("click", async (event) => {
+            const submenuTrigger = event.target.closest(".cg-object-command-submenu__trigger");
+            if (submenuTrigger) {
+                event.preventDefault();
+                event.stopPropagation();
+                const submenu = submenuTrigger.closest(".cg-object-command-submenu");
+                const willOpen = !submenu.classList.contains("is-open");
+                objectContextMenu.querySelectorAll(".cg-object-command-submenu.is-open").forEach((item) => item.classList.remove("is-open"));
+                submenu.classList.toggle("is-open", willOpen);
+                submenuTrigger.setAttribute("aria-expanded", String(willOpen));
+                if (willOpen) positionObjectCommandSubmenu(submenu);
+                return;
+            }
+            const toolbarControl = event.target.closest("[data-cg-object-toolbar-action]");
+            if (toolbarControl && !toolbarControl.disabled) {
+                const popupOrigin = contextMenuOrigin;
+                hideObjectContextMenu(false);
+                window.CGOpenSelectionToolbarActionAt?.(
+                    toolbarControl.dataset.cgObjectToolbarAction,
+                    popupOrigin
+                );
+                return;
+            }
             const control = event.target.closest("[data-cg-object-command]");
             const target = state.activeCanvas && (state.activeCanvas.getActiveObject() || contextMenuTarget);
             if (!control || !target || control.disabled) return;
             const command = control.dataset.cgObjectCommand;
-            hideObjectContextMenu(command !== "properties");
+            const popupOrigin = contextMenuOrigin;
+            hideObjectContextMenu(!["properties", "animation", "actions", "effects"].includes(command));
             if (command === "copy") await window.CGCopyActiveObject?.();
             else if (command === "paste") await window.CGPasteObject?.();
             else if (command === "duplicate") await window.CGDuplicateActiveObject?.();
             else if (command === "delete") window.requestDeleteSelectedObjects?.();
             else if (command === "properties") window.openObjectPropertyBar?.(target);
+            else if (command === "animation" || command === "actions") {
+                /* STAMP: 2026-09-29 - A context-menu automation choice opens
+                 * beside the clicked object; toolbar choices keep their toolbar anchor. */
+                const anchor = popupOrigin ? { cgReplacementOrigin: popupOrigin } : control;
+                window.openQuickActionDropdown?.(target, command, anchor);
+            }
+            else if (command === "effects") window.CGObjectEffects?.open(target);
             else if (command === "export-png") await exportContextTarget(target);
             else if (["front", "forward", "backward", "back"].includes(command)) runLayerCommand(command, target);
             else if (command === "lock") toggleContextTargetLock(target);
@@ -2498,6 +2632,16 @@
         function positionToolbarDropdown() {
             if (quickPopup.popup.hidden || !dropdownAnchor || state.dragPointerId != null) return;
             const popup = quickPopup.popup;
+            /* STAMP: 2026-09-15 - Category commands replace their menu in
+             * place for every object type, including legacy automation panels. */
+            if (dropdownAnchor.cgReplacementOrigin && !dropdownManuallyPlaced) {
+                const origin = dropdownAnchor.cgReplacementOrigin;
+                popup.style.setProperty("--cg-dropdown-available-height", `${Math.max(80, window.innerHeight - 28)}px`)
+                const next = clampPopupPosition(origin.left, origin.top);
+                popup.style.left = next.left + "px";
+                popup.style.top = next.top + "px";
+                return;
+            }
             if (dropdownManuallyPlaced) {
                 const current = popup.getBoundingClientRect();
                 const next = clampPopupPosition(current.left, current.top);
@@ -2522,7 +2666,8 @@
                 top = bounds.top;
             } else {
                 const useBelow = below >= above;
-                availableHeight = useBelow ? below : above;
+                // STAMP: 2026-09-21 - Fit the full panel to the viewport, not the gap beside its trigger.
+                availableHeight = window.innerHeight - (margin * 2)
                 popup.style.setProperty("--cg-dropdown-available-height", availableHeight + "px");
                 top = useBelow ? bounds.bottom + gap : bounds.top - gap - popup.getBoundingClientRect().height;
             }
@@ -2584,8 +2729,13 @@
             return window.openQuickActionDropdown(target, "quick", document.querySelector(".cg-selection-toolbar"));
         };
         document.addEventListener("mousedown", (event) => {
-            if (!quickPopup.popup.hidden && !quickPopup.popup.contains(event.target) &&
-                !event.target.closest(".cg-selection-toolbar, #colorPickerPopup, #cgObjectPreviewDialog, .modal, .select2-container")) hidePopup();
+            /* STAMP: 2026-09-30 - Quick Controls is a persistent authoring
+             * surface. Property choices and other editor chrome must not close
+             * it; only a deliberate return to the live Fabric canvas does. */
+            if (!quickPopup.popup.hidden &&
+                (event.target === state.activeCanvas?.upperCanvasEl || event.target === state.activeCanvas?.lowerCanvasEl)) {
+                hidePopup();
+            }
         });
         document.addEventListener("keydown", (event) => {
             // STAMP: 2026-09-07 - Dismiss the preview before its parent dropdown.
@@ -2598,6 +2748,16 @@
         window.addEventListener("cg:slide-navigation-start", hidePopup);
         window.addEventListener("cg:close-quick-dropdown", hidePopup);
 
+        /* STAMP: 2026-10-01 - Suppress the native browser menu throughout the
+         * live Fabric stage before canvas binding completes. Fabric's right-click
+         * mouse event remains responsible for opening the custom object menu. */
+        document.addEventListener("contextmenu", (event) => {
+            const target = event.target instanceof Element ? event.target : null;
+            if (!target || !target.closest("#canvas-container, .cg-canvas-stage, .canvas-container, canvas, .cg-floating-canvas-toolbar, .cg-toolbar-dropdown, .cg-object-command-menu, .cg-context-popup")) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }, true);
+
         function bindCanvas() {
             if (state.activeCanvas || typeof canvas === "undefined" || !canvas || typeof canvas.on !== "function") {
                 return Boolean(state.activeCanvas);
@@ -2608,6 +2768,18 @@
             state.activeCanvas.stopContextMenu = true;
 
             const canvasElement = state.activeCanvas.upperCanvasEl || state.activeCanvas.lowerCanvasEl;
+
+            /* STAMP: 2026-10-01 - Direct DOM guards are intentionally repeated
+             * on every Fabric surface so the native menu cannot bypass the
+             * document guard through Fabric's stacked canvas elements. */
+            [
+                state.activeCanvas.upperCanvasEl,
+                state.activeCanvas.lowerCanvasEl,
+                state.activeCanvas.wrapperEl,
+                document.getElementById("canvas-container")
+            ].filter(Boolean).forEach((surface) => {
+                surface.oncontextmenu = () => false;
+            });
 
             if (canvasElement) {
                 canvasElement.addEventListener("contextmenu", (event) => {
@@ -2704,6 +2876,14 @@
         let textSettingsPanel = document.getElementById("TextSettingsarea");
         const textPrimaryHost = createElement("div", "cg-selection-text-primary");
         const textMorePopover = createElement("div", "cg-selection-quick-popover cg-selection-text-more-popover");
+        // STAMP: 2026-09-16 - Direct text-list menu; choices share the formatter registry.
+        const textListPopover = createElement("div", "cg-selection-quick-popover cg-selection-text-list-popover");
+        textListPopover.id = "cgTextListPopover";
+        textListPopover.setAttribute("role", "dialog");
+        textListPopover.setAttribute("aria-label", "Text lists");
+        textListPopover.innerHTML = '<div class="cg-selection-quick-popover__header"><span>Text lists</span><button type="button" class="cg-selection-quick-popover__close" data-cg-list-close aria-label="Close text lists"><i class="fa fa-times" aria-hidden="true"></i></button></div>'
+            + ['Bullets', 'Ordered'].map((category) => `<div class="cg-text-list-menu__section"><span>${category === 'Bullets' ? 'Unordered list · Bullet icons' : 'Ordered lists'}</span><div class="cg-text-list-menu__choices" role="menu" aria-label="${category}">${(window.CGTextLists?.choices || []).filter((choice) => choice.category === category).map((choice) => `<button type="button" role="menuitemradio" aria-checked="false" data-cg-text-list="${choice.id}" title="${choice.label}"><b aria-hidden="true">${choice.marker}</b><span>${choice.label}</span></button>`).join('')}</div></div>`).join('')
+            + '<button type="button" class="cg-text-list-menu__remove" data-cg-text-list="none"><i class="fa fa-eraser" aria-hidden="true"></i> Remove list</button>';
         // STAMP: 2026-09-09 - Custom font menu enables reversible canvas previews; native option hover cannot.
         const fontPopover = createElement("div", "cg-selection-quick-popover cg-selection-font-popover");
         fontPopover.setAttribute("role", "listbox");
@@ -2736,9 +2916,7 @@
             + '<div class="cg-selection-color-popover__tabs" role="tablist" aria-label="Colour type">'
             + '<button type="button" class="is-active" role="tab" aria-selected="true" data-cg-color-tab="back">Back</button>'
             + '<button type="button" role="tab" aria-selected="false" data-cg-color-tab="stroke">Stroke</button></div>'
-            + '<button type="button" class="cg-selection-color-popover__choose" data-cg-color-choose>'
-            + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" data-cg-color-preview></rect></svg>'
-            + '<span><b data-cg-color-label>Back colour</b><small data-cg-color-value>#000000</small></span><i class="fa fa-angle-right" aria-hidden="true"></i></button>';
+            + '<div class="cg-selection-color-popover__palette-host" data-cg-color-palette-host></div>';
         const textStylePopover = createElement("div", "cg-selection-quick-popover cg-selection-text-style-popover");
         textStylePopover.innerHTML = '<div class="cg-selection-quick-popover__header"><span>Text style</span><button type="button" class="cg-selection-quick-popover__close" data-cg-quick-close aria-label="Close text styles"><i class="fa fa-times" aria-hidden="true"></i></button></div>'
             + '<label class="cg-selection-text-style-popover__weight"><span>Font Weight</span><select data-cg-font-weight aria-label="Font weight">'
@@ -2776,8 +2954,9 @@
          */
         const moreActionsPopover = createElement("div", "cg-selection-quick-popover cg-selection-more-actions-popover");
         moreActionsPopover.setAttribute("role", "menu");
-        moreActionsPopover.setAttribute("aria-label", "More actions");
-        moreActionsPopover.innerHTML = '<div class="cg-selection-quick-popover__header"><span>More actions</span><button type="button" class="cg-selection-quick-popover__close" data-cg-more-close aria-label="Close more actions"><i class="fa fa-times" aria-hidden="true"></i></button></div><div class="cg-selection-more-actions-popover__sections" data-cg-more-sections></div>';
+        moreActionsPopover.setAttribute("aria-label", "Categorised object actions");
+        moreActionsPopover.id = "cgSelectionCategorisedActions";
+        moreActionsPopover.innerHTML = '<div class="cg-selection-quick-popover__header"><span data-cg-more-title>Actions</span><button type="button" class="cg-selection-quick-popover__close" data-cg-more-close aria-label="Close action menu"><i class="fa fa-times" aria-hidden="true"></i></button></div><div class="cg-selection-more-actions-popover__sections" data-cg-more-sections></div>';
         const mountTextControls = () => {
             textSettingsPanel = textSettingsPanel || document.getElementById("TextSettingsarea");
             if (!textSettingsPanel || textPrimaryHost.children.length || textMorePopover.children.length) return;
@@ -2796,6 +2975,7 @@
         };
         mountTextControls();
         textMorePopover.hidden = true;
+        textListPopover.hidden = true;
         fontPopover.hidden = true;
         textSizePopover.hidden = true;
         headingPopover.hidden = true;
@@ -2902,6 +3082,7 @@
         document.body.appendChild(interactionPopover);
         document.body.appendChild(motionPopover);
         document.body.appendChild(textMorePopover);
+        document.body.appendChild(textListPopover);
         document.body.appendChild(fontPopover);
         document.body.appendChild(textSizePopover);
         document.body.appendChild(headingPopover);
@@ -2915,6 +3096,18 @@
         document.body.appendChild(moreActionsPopover);
         document.body.appendChild(legacyControlStorage);
         let activeCanvas = null;
+        // STAMP: 2026-09-15 - Shared replacement origin, independent of
+        // object type and of the hidden authoritative action button's bounds.
+        let categoryPanelOrigin = null;
+        // STAMP: 2026-09-15 - Preserve the clicked visible action across
+        // toolbar refreshes, without selecting hidden category proxy buttons.
+        let currentQuickAction = "";
+        const highlightCurrentQuickAction = () => {
+            Array.from(bar.children).forEach((control) => {
+                const key = control.dataset.cgSelectionAction || (control.hasAttribute("data-cg-selection-font-toggle") ? "font-family" : "");
+                control.classList.toggle("is-current-action", Boolean(key && key === currentQuickAction));
+            });
+        };
         let rightClickSuppressed = false;
         let propertyPopupOpen = false;
         let linkSelectionScope = null;
@@ -3244,32 +3437,109 @@
             return text && end > start ? { start, end, text } : null;
         };
         const button = (icon, label, action) => `<button type="button" data-cg-selection-action="${action}" title="${label}" aria-label="${label}"><i class="fa ${icon}" aria-hidden="true"></i></button>`;
-        const groupedActionSources = (actions) => `<span class="cg-selection-toolbar__grouped-sources" aria-hidden="true">${actions}</span>`;
-        const moreActionsButton = '<button type="button" data-cg-selection-action="more-actions" title="More actions" aria-label="More actions" aria-haspopup="menu" aria-expanded="false"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
-        const renderMoreActionsMenu = (sections) => {
-            const host = moreActionsPopover.querySelector("[data-cg-more-sections]");
-            host.innerHTML = sections.filter((section) => section.actions.length).map((section) => (
-                `<section class="cg-selection-more-actions-popover__section"><span>${section.label}</span><div>${section.actions.map((action) => (
-                    `<button type="button" role="menuitem" data-cg-more-action="${action.action}"><i class="fa ${action.icon}" aria-hidden="true"></i><span>${action.label}</span></button>`
-                )).join("")}</div></section>`
-            )).join("");
+        /* STAMP: 2026-09-15 - Text size uses the same quiet label-and-chevron
+         * language as the reference toolbar instead of a mismatched tall-T
+         * glyph. Its existing font-size popover remains the action owner. */
+        const textSizeButton = (target) => `<button type="button" class="cg-selection-toolbar__text-size" data-cg-selection-action="font-size" title="Font Size" aria-label="Font Size" aria-haspopup="dialog" aria-expanded="false"><span data-cg-text-size-label>${getSelectionFontSize(target)} px</span><i class="fa fa-angle-down" aria-hidden="true"></i></button>`;
+        /**
+         * STAMP: 2026-09-14 - Report the live Fabric font size from the compact
+         * toolbar icon without replacing its established font-size action.
+         * When text is being edited, prefer the first selected character's
+         * complete style so range-level font sizing is represented accurately.
+         */
+        const getSelectionFontSize = (target) => {
+            let fontSize = Number(target?.fontSize);
+            if (isText(target) && target.isEditing && typeof target.getSelectionStyles === "function") {
+                const start = Math.max(0, Number(target.selectionStart) || 0);
+                const selectionEnd = Math.max(start, Number(target.selectionEnd) || start);
+                const end = selectionEnd > start ? selectionEnd : start + 1;
+                const selectedStyle = (target.getSelectionStyles(start, end, true) || [])
+                    .find((style) => Number.isFinite(Number(style?.fontSize)) && Number(style.fontSize) > 0);
+                if (selectedStyle) fontSize = Number(selectedStyle.fontSize);
+            }
+            if (!Number.isFinite(fontSize) || fontSize <= 0) fontSize = 30;
+            return Number.isInteger(fontSize) ? String(fontSize) : fontSize.toFixed(2).replace(/\.?0+$/, "");
         };
-        const colorButton = (backColor, strokeColor) => '<button type="button" class="cg-selection-toolbar__color-menu" data-cg-selection-action="color-menu" title="Back and stroke colour" aria-label="Back and stroke colour" aria-haspopup="dialog" aria-expanded="false">'
-            + `<svg viewBox="0 0 28 22" aria-hidden="true"><circle cx="10" cy="11" r="7" fill="${backColor}"></circle><circle cx="18" cy="11" r="7" fill="${strokeColor}"></circle></svg>`
+        const syncFontSizeTooltip = (target) => {
+            const control = bar.querySelector('[data-cg-selection-action="font-size"]');
+            if (!control || !isText(target)) return;
+            const fontSize = getSelectionFontSize(target);
+            const label = `Font Size: ${fontSize}px`;
+            control.title = label;
+            control.setAttribute("aria-label", label);
+            const visibleLabel = control.querySelector("[data-cg-text-size-label]");
+            if (visibleLabel) visibleLabel.textContent = `${fontSize} px`;
+        };
+        const groupedActionSources = (actions) => `<span class="cg-selection-toolbar__grouped-sources" aria-hidden="true">${actions}</span>`;
+        /* STAMP: 2026-09-15 - Give Controls, Arrange, and Object their own
+         * stable toolbar entry for every selection type. Each compact menu
+         * still delegates to the original hidden action source below. */
+        const categorisedActionButtons = [
+            { category: "controls", icon: "fa-sliders", label: "Controls" },
+            { category: "arrange", icon: "fa-arrows-alt", label: "Arrange" },
+            { category: "object", icon: "fa-cube", label: "Object" }
+        ].map(({ category, icon, label }) => (
+            `<button type="button" class="cg-selection-toolbar__category-action" data-cg-selection-action="more-${category}" title="${label}" aria-label="${label}" aria-haspopup="menu" aria-controls="cgSelectionCategorisedActions" aria-expanded="false"><i class="fa ${icon}" aria-hidden="true"></i></button>`
+        )).join("");
+        let activeMoreCategory = "";
+        let moreActionSections = {};
+        const setMoreActionSections = (sections) => {
+            moreActionSections = Object.fromEntries(sections.map((section) => [section.category, section]));
+        };
+        const renderMoreActionsMenu = (category) => {
+            const host = moreActionsPopover.querySelector("[data-cg-more-sections]");
+            const section = moreActionSections[category];
+            if (!section) return false;
+            moreActionsPopover.setAttribute("aria-label", `${section.label} actions`);
+            moreActionsPopover.querySelector("[data-cg-more-title]").textContent = section.label;
+            host.innerHTML = `<section class="cg-selection-more-actions-popover__section"><div>${section.actions.map((action) => (
+                `<button type="button" role="menuitem" data-cg-more-action="${action.action}"><i class="fa ${action.icon}" aria-hidden="true"></i><span>${action.label}</span></button>`
+            )).join("")}</div></section>`;
+            host.querySelectorAll("[data-cg-more-action]").forEach((control) => {
+                const source = bar.querySelector(`[data-cg-selection-action="${control.dataset.cgMoreAction}"]`);
+                control.disabled = Boolean(source?.disabled);
+                control.setAttribute("aria-disabled", String(Boolean(source?.disabled)));
+            });
+            return true;
+        };
+        const colorButton = (backColor, strokeColor, label = "Back and stroke colour") => `<button type="button" class="cg-selection-toolbar__color-menu" data-cg-selection-action="color-menu" title="${label}" aria-label="${label}" aria-haspopup="dialog" aria-expanded="false">`
+            + `<svg viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="8" fill="${backColor}" stroke="${strokeColor}" stroke-width="2"></circle></svg>`
             + '<i class="fa fa-angle-down" aria-hidden="true"></i></button>';
+        const getEffectiveTextPaint = (target, property) => {
+            if (!isText(target)) return target?.[property];
+            if (target.isEditing && typeof target.getSelectionStyles === "function") {
+                const start = Math.max(0, Number(target.selectionStart) || 0);
+                const selectedEnd = Math.max(start, Number(target.selectionEnd) || start);
+                const end = selectedEnd > start ? selectedEnd : start + 1;
+                const selectedStyle = (target.getSelectionStyles(start, end, true) || [])
+                    .find((style) => typeof style?.[property] === "string" && style[property]);
+                if (selectedStyle) return selectedStyle[property];
+            }
+            for (const lineStyles of Object.values(target.styles || {})) {
+                const characterStyle = Object.values(lineStyles || {})
+                    .find((style) => typeof style?.[property] === "string" && style[property]);
+                if (characterStyle) return characterStyle[property];
+            }
+            return target[property];
+        };
         const syncColorPopover = (target) => {
-            const isStroke = colorMode === "stroke";
-            const rawColor = isStroke ? target?.stroke : target?.fill;
-            const fallback = "#000000";
-            const color = /^#[0-9a-f]{6}$/i.test(String(rawColor || "")) ? rawColor : fallback;
+            if (!target) return;
             colorPopover.querySelectorAll("[data-cg-color-tab]").forEach((tab) => {
                 const selected = tab.dataset.cgColorTab === colorMode;
                 tab.classList.toggle("is-active", selected);
                 tab.setAttribute("aria-selected", String(selected));
             });
-            colorPopover.querySelector("[data-cg-color-label]").textContent = isStroke ? "Stroke colour" : "Back colour";
-            colorPopover.querySelector("[data-cg-color-value]").textContent = color.toUpperCase();
-            colorPopover.querySelector("[data-cg-color-preview]").setAttribute("fill", color);
+        };
+        const openEmbeddedColorPalette = (target) => {
+            if (!target || typeof window.CGOpenEmbeddedColorPicker !== "function") return false;
+            const isStroke = colorMode === "stroke";
+            const source = document.getElementById(isText(target)
+                ? (isStroke ? "FontStroke" : "FontColor")
+                : (isStroke ? "objstrokecolor" : "objbackcolor"));
+            return Boolean(source && window.CGOpenEmbeddedColorPicker(
+                source,
+                colorPopover.querySelector("[data-cg-color-palette-host]")
+            ));
         };
         const syncTextStyleControls = (target) => {
             const selectedTextStyle = target?.isEditing
@@ -3299,6 +3569,7 @@
            around (never across) the currently selected object's perimeter. */
         const dragHandle = '<button type="button" class="cg-selection-toolbar__drag-handle" data-cg-selection-drag title="Move quick actions" aria-label="Drag quick actions around selected object"><i class="fa fa-arrows" aria-hidden="true"></i></button>';
         const hidePopovers = () => {
+            categoryPanelOrigin = null;
             restoreFontPreview();
             fontPreviewState = null;
             fontPopover.hidden = true;
@@ -3316,9 +3587,12 @@
             interactionPopover.hidden = true;
             motionPopover.hidden = true;
             textMorePopover.hidden = true;
+            textListPopover.hidden = true;
+            bar.querySelector('[data-cg-selection-action="text-list"]')?.setAttribute("aria-expanded", "false");
             textSizePopover.hidden = true;
             headingPopover.hidden = true;
             textAlignmentPopover.hidden = true;
+            window.CGCloseEmbeddedColorPicker?.();
             colorPopover.hidden = true;
             textStylePopover.hidden = true;
             bar.querySelector('[data-cg-selection-action="color-menu"]')?.setAttribute("aria-expanded", "false");
@@ -3328,10 +3602,73 @@
             groupMorePopover.hidden = true;
             imageScalePopover.hidden = true;
             moreActionsPopover.hidden = true;
-            bar.querySelector('[data-cg-selection-action="more-actions"]')?.setAttribute("aria-expanded", "false");
+            bar.querySelectorAll('.cg-selection-toolbar__category-action').forEach((control) => control.setAttribute("aria-expanded", "false"));
+            activeMoreCategory = "";
+        };
+        const hasOpenQuickPopover = () => [
+            shapeSizePopover, opacityPopover, linkPopover, orderPopover,
+            alignmentPopover, transformPopover, shadowPopover, cropPopover,
+            interactionPopover, motionPopover, textMorePopover, textListPopover,
+            fontPopover, textSizePopover, headingPopover, textAlignmentPopover,
+            colorPopover, textStylePopover, shapeMorePopover, imageMorePopover,
+            groupMorePopover, imageScalePopover, moreActionsPopover
+        ].some((popover) => !popover.hidden);
+        /* STAMP: 2026-09-29 - The right-click menu mirrors the live toolbar
+         * inventory so every object type keeps one authoritative action set. */
+        window.CGGetSelectionToolbarActionGroups = function () {
+            const excluded = new Set(["close-toolbar", "delete", "dropdown-quick", "dropdown-animation", "dropdown-actions"]);
+            const directActions = Array.from(bar.querySelectorAll("[data-cg-selection-action]"))
+                .filter((control) => !control.closest(".cg-selection-toolbar__grouped-sources"))
+                .filter((control) => !control.dataset.cgSelectionAction.startsWith("more-"))
+                .filter((control) => !excluded.has(control.dataset.cgSelectionAction))
+                .map((control) => ({
+                    action: control.dataset.cgSelectionAction,
+                    label: control.getAttribute("aria-label") || control.title || control.dataset.cgSelectionAction,
+                    icon: Array.from(control.querySelector("i")?.classList || []).find((name) => name.startsWith("fa-") && name !== "fa") || "fa-circle-o",
+                    disabled: Boolean(control.disabled)
+                }));
+            const groups = [];
+            if (directActions.length) groups.push({
+                label: directActions.some((entry) => ["bold", "strike", "font-size", "font-family", "text-list"].includes(entry.action)) ? "Formatting" : "Quick actions",
+                icon: "fa-magic",
+                actions: directActions
+            });
+            [
+                ["controls", "Controls", "fa-sliders"],
+                ["arrange", "Arrange", "fa-arrows-alt"],
+                ["object", "Object", "fa-cube"]
+            ].forEach(([category, label, icon]) => {
+                const section = moreActionSections[category];
+                if (!section || !section.actions.length) return;
+                groups.push({
+                    label,
+                    icon,
+                    actions: section.actions.filter((entry) => !excluded.has(entry.action) && entry.action !== "lock").map((entry) => {
+                        const source = bar.querySelector(`[data-cg-selection-action="${entry.action}"]`);
+                        return { ...entry, disabled: Boolean(source?.disabled) };
+                    })
+                });
+            });
+            return groups;
+        };
+        window.CGOpenSelectionToolbarActionAt = function (action, origin) {
+            const control = bar.querySelector(`[data-cg-selection-action="${action}"]`);
+            const target = activeCanvas?.getActiveObject();
+            if (!control || control.disabled || !target) return false;
+            if (action.startsWith("dropdown-")) {
+                hidePopovers();
+                return Boolean(window.openQuickActionDropdown?.(target, action.replace("dropdown-", ""), { cgReplacementOrigin: origin || { left: 14, top: 14 } }));
+            }
+            hidePopovers();
+            control.click();
+            categoryPanelOrigin = origin || null;
+            window.requestAnimationFrame(position);
+            return true;
         };
         // STAMP: 2026-09-05 - One quick-action dropdown or color palette at a time.
         window.addEventListener("cg:color-palette-opening", hidePopovers);
+        // STAMP: 2026-09-21 - Cancel/close dismisses the entire colour dropdown.
+        window.addEventListener("cg:close-color-dropdown", hidePopovers)
         const hide = () => {
             bar.hidden = true;
             hidePopovers();
@@ -3623,7 +3960,7 @@
             bar.style.left = `${Math.round(clampLeft(left))}px`;
             bar.style.top = `${Math.round(clampTop(top))}px`;
 
-            [shapeSizePopover, opacityPopover, linkPopover, orderPopover, alignmentPopover, transformPopover, shadowPopover, cropPopover, interactionPopover, motionPopover, textMorePopover, fontPopover, textSizePopover, headingPopover, textAlignmentPopover, colorPopover, textStylePopover, shapeMorePopover, imageMorePopover, groupMorePopover, imageScalePopover, moreActionsPopover].forEach((popover) => {
+            [shapeSizePopover, opacityPopover, linkPopover, orderPopover, alignmentPopover, transformPopover, shadowPopover, cropPopover, interactionPopover, motionPopover, textMorePopover, textListPopover, fontPopover, textSizePopover, headingPopover, textAlignmentPopover, colorPopover, textStylePopover, shapeMorePopover, imageMorePopover, groupMorePopover, imageScalePopover, moreActionsPopover].forEach((popover) => {
                 if (popover.hidden) return;
                 const popoverRect = popover.getBoundingClientRect();
                 const fontToggle = bar.querySelector("[data-cg-selection-font-toggle]");
@@ -3669,7 +4006,7 @@
                     textAlignmentPopover.style.top = `${Math.round(top)}px`;
                 }
             }
-            [[headingPopover, "heading"], [colorPopover, "color-menu"], [textStylePopover, "text-style"], [moreActionsPopover, "more-actions"]].forEach(([popover, action]) => {
+            [[headingPopover, "heading"], [colorPopover, "color-menu"], [textStylePopover, "text-style"], [moreActionsPopover, activeMoreCategory ? `more-${activeMoreCategory}` : "more-controls"]].forEach(([popover, action]) => {
                 if (popover.hidden) return;
                 const anchor = bar.querySelector(`[data-cg-selection-action="${action}"]`);
                 if (!anchor) return;
@@ -3682,7 +4019,15 @@
                 popover.style.left = `${Math.round(Math.max(8, Math.min(window.innerWidth - popupRect.width - 8, anchorRect.left + (anchorRect.width - popupRect.width) / 2)))}px`;
                 popover.style.top = `${Math.round(top)}px`;
             });
-            if (!imageScalePopover.hidden) {
+            if (categoryPanelOrigin) {
+                [shapeSizePopover, opacityPopover, linkPopover, orderPopover, alignmentPopover, transformPopover, shadowPopover, cropPopover, interactionPopover, motionPopover, textMorePopover, textListPopover, fontPopover, textSizePopover, headingPopover, textAlignmentPopover, colorPopover, textStylePopover, shapeMorePopover, imageMorePopover, groupMorePopover, imageScalePopover].forEach((popover) => {
+                    if (popover.hidden) return;
+                    const rect = popover.getBoundingClientRect();
+                    popover.style.left = `${Math.round(Math.max(8, Math.min(window.innerWidth - rect.width - 8, categoryPanelOrigin.left)))}px`;
+                    popover.style.top = `${Math.round(Math.max(8, Math.min(window.innerHeight - rect.height - 8, categoryPanelOrigin.top)))}px`;
+                });
+            }
+            if (!imageScalePopover.hidden && !categoryPanelOrigin) {
                 const scaleButton = bar.querySelector('[data-cg-selection-action="image-scale"]');
                 if (scaleButton) {
                     const anchorRect = scaleButton.getBoundingClientRect();
@@ -3704,6 +4049,7 @@
             }
 
             if (toolbarPlacementTarget !== target) {
+                currentQuickAction = "";
                 toolbarPlacementTarget = target;
                 toolbarPlacement = null;
             }
@@ -3733,6 +4079,7 @@
             const formatPainterAction = targetType === "activeselection"
                 ? ""
                 : button("fa-paint-brush", "Format Painter", "format-painter");
+            const effectsAction = button("fa-magic", "Effects", "effects");
             const inspectorActions = button("fa-sliders", "Quick controls", "dropdown-quick")
                 /* STAMP: 2026-09-11 - Hide animation authoring when the active
                  * slide disables playback; Actions remain independently usable. */
@@ -3752,19 +4099,19 @@
             /* STAMP: 2026-09-10 - Keep the requested right-edge sequence:
              * Close, Delete, Save, Lock, Opacity when read right to left. */
             const commonMoreSections = [
-                { label: "Controls", actions: [
+                { category: "controls", label: "Controls", actions: [
                     { icon: "fa-sliders", label: "Quick controls", action: "dropdown-quick" },
                     ...(isAnimationDisabled ? [] : [{ icon: "fa-play-circle", label: "Animation", action: "dropdown-animation" }]),
                     { icon: "fa-bolt", label: "Actions", action: "dropdown-actions" }
                 ] },
-                { label: "Arrange", actions: [
+                { category: "arrange", label: "Arrange", actions: [
                     { icon: "fa-compress", label: "Move inside canvas", action: "keep-in-canvas" },
                     { icon: targetType === "text" || targetType === "textbox" || targetType === "i-text" ? "fa-crosshairs" : "fa-align-center", label: "Alignment", action: "alignment" },
                     { icon: "fa-arrows", label: "Transform", action: "transform" },
                     { icon: "fa-sort", label: "Order", action: "order" },
                     { icon: "fa-adjust", label: "Transparency", action: "transparency" }
                 ] },
-                { label: "Object", actions: [
+                { category: "object", label: "Object", actions: [
                     { icon: "fa-share", label: "Share properties", action: "share-properties" },
                     ...(targetType === "activeselection" ? [] : [{ icon: "fa-paint-brush", label: "Format Painter", action: "format-painter" }]),
                     { icon: isLocked ? "fa-unlock" : "fa-lock", label: isLocked ? "Unlock object" : "Lock object", action: "lock" },
@@ -3774,34 +4121,53 @@
 
             if (targetType === "activeselection") {
                 bar.classList.remove("cg-selection-toolbar--text");
-                renderMoreActionsMenu(commonMoreSections);
+                setMoreActionSections(commonMoreSections);
                 bar.innerHTML = dragHandle + button("fa-object-group", "Group selected objects", "group")
-                    + groupedActionSources(commonSecondaryActions) + moreActionsButton
+                    + effectsAction + groupedActionSources(commonSecondaryActions) + categorisedActionButtons
                     + button("fa-trash", "Delete", "delete") + button("fa-times", "Close quick actions", "close-toolbar");
             } else if (isText(target)) {
                 mountTextControls();
                 bar.classList.add("cg-selection-toolbar--text");
                 const family = String(target.fontFamily || "Arial");
-                const safeFill = /^#[0-9a-f]{6}$/i.test(String(target.fill || "")) ? target.fill : "#000000";
-                const safeStroke = /^#[0-9a-f]{6}$/i.test(String(target.stroke || "")) ? target.stroke : "#000000";
-                bar.innerHTML = dragHandle
-                    + button("fa-pencil", "Edit Text", "edit-text")
-                    + '<button type="button" class="cg-selection-toolbar__font" data-cg-selection-font-toggle aria-label="Font Family" title="Font Family" aria-haspopup="listbox" aria-expanded="false"><span data-cg-selection-font-label></span><i class="fa fa-angle-down" aria-hidden="true"></i></button>'
+                const effectiveFill = getEffectiveTextPaint(target, "fill");
+                const effectiveStroke = getEffectiveTextPaint(target, "stroke");
+                const safeFill = /^#[0-9a-f]{6}$/i.test(String(effectiveFill || "")) ? effectiveFill : "#000000";
+                const safeStroke = /^#[0-9a-f]{6}$/i.test(String(effectiveStroke || "")) ? effectiveStroke : "#000000";
+                /* STAMP: 2026-09-15 - Keep the reference strip focused on
+                 * frequent formatting. Edit, Heading and advanced Text Style
+                 * stay available from Controls via their original handlers. */
+                const textSecondaryActions = button("fa-pencil", "Edit Text", "edit-text")
                     + button("fa-header", "Heading", "heading")
-                    + button("fa-text-height", "Font Size", "font-size")
-                    + colorButton(safeFill, safeStroke)
-                    + '<button type="button" class="cg-selection-toolbar__menu-button" data-cg-selection-action="text-style" title="Text styles" aria-label="Text styles" aria-haspopup="dialog" aria-expanded="false"><i class="fa fa-bold" aria-hidden="true"></i><i class="fa fa-angle-down" aria-hidden="true"></i></button>'
-                    + button(`fa-align-${target.textAlign === "justify" ? "justify" : target.textAlign === "right" ? "right" : target.textAlign === "center" ? "center" : "left"}`, "Text Alignment", "text-alignment")
-                    + button("fa-ellipsis-h", "More text properties", "text-more") + button("fa-link", "Add action link", "link")
-                    + groupedActionSources(commonSecondaryActions) + moreActionsButton
+                    + button("fa-sliders", "Text styles", "text-style");
+                const controlsSection = commonMoreSections.find((section) => section.category === "controls");
+                controlsSection.actions = [
+                    { icon: "fa-pencil", label: "Edit Text", action: "edit-text" },
+                    { icon: "fa-header", label: "Heading", action: "heading" },
+                    { icon: "fa-sliders", label: "Text styles", action: "text-style" },
+                    { icon: "fa-ellipsis-h", label: "More text properties", action: "text-more" },
+                    ...controlsSection.actions
+                ];
+                bar.innerHTML = dragHandle
+                    + colorButton(safeFill, safeStroke, "Font and stroke colour")
+                    + '<button type="button" class="cg-selection-toolbar__font" data-cg-selection-font-toggle aria-label="Font Family" title="Font Family" aria-haspopup="listbox" aria-expanded="false"><span class="cg-selection-toolbar__font-symbol" aria-hidden="true">Aa</span><i class="fa fa-angle-down" aria-hidden="true"></i></button>'
+                    + textSizeButton(target)
+                    + button("fa-bold", "Bold", "bold")
+                    + button("fa-strikethrough", "Strikethrough", "strike")
+                    + button("fa-link", "Add action link", "link")
+                    + '<button type="button" data-cg-selection-action="text-list" title="Text lists" aria-label="Text lists" aria-haspopup="dialog" aria-controls="cgTextListPopover" aria-expanded="false"><i class="fa fa-list-ul" aria-hidden="true"></i><i class="fa fa-angle-down" aria-hidden="true"></i></button>'
+                    + `<button type="button" class="cg-selection-toolbar__alignment-menu" data-cg-selection-action="text-alignment" title="Text Alignment" aria-label="Text Alignment" aria-haspopup="dialog" aria-expanded="false"><i class="fa fa-align-${target.textAlign === "justify" ? "justify" : target.textAlign === "right" ? "right" : target.textAlign === "center" ? "center" : "left"}" aria-hidden="true"></i><i class="fa fa-angle-down" aria-hidden="true"></i></button>`
+                    + effectsAction + groupedActionSources(textSecondaryActions + commonSecondaryActions) + categorisedActionButtons
                     + button("fa-trash", "Delete", "delete") + button("fa-times", "Close quick actions", "close-toolbar");
-                renderMoreActionsMenu(commonMoreSections);
+                setMoreActionSections(commonMoreSections);
                 const fontControl = bar.querySelector("[data-cg-selection-font-toggle]");
                 if (fontControl) {
                     fontControl.style.fontFamily = family;
                     fontControl.setAttribute("aria-label", `Font Family: ${family}`);
-                    fontControl.querySelector("[data-cg-selection-font-label]").textContent = family;
                 }
+                bar.querySelector('[data-cg-selection-action="bold"]')?.setAttribute("aria-pressed", String(Number(target.fontWeight) >= 600 || target.fontWeight === "bold"));
+                bar.querySelector('[data-cg-selection-action="strike"]')?.setAttribute("aria-pressed", String(Boolean(target.linethrough)));
+                bar.querySelector('[data-cg-selection-action="text-list"]')?.setAttribute("aria-pressed", String(Boolean(target.cgTextListStyle)));
+                syncFontSizeTooltip(target);
             } else {
                 bar.classList.remove("cg-selection-toolbar--text");
                 const canFill = target.type !== "image" && target.type !== "group";
@@ -3812,18 +4178,20 @@
                     : (targetType === "group"
                         ? button("fa-ellipsis-h", "More group properties", "group-more")
                         : button("fa-cube", "3D Effect", "shape-3d") + button("fa-undo", "Reset Shape Properties", "shape-reset"));
-                const typeSpecificMoreSection = targetType === "image"
-                    ? { label: "Image", actions: [
+                const typeSpecificObjectActions = targetType === "image"
+                    ? [
                         { icon: "fa-download", label: "Download image", action: "download-image" },
                         { icon: "fa-ellipsis-h", label: "Image properties", action: "image-more" }
-                    ] }
+                    ]
                     : (targetType === "group"
-                        ? { label: "Group", actions: [{ icon: "fa-ellipsis-h", label: "Group properties", action: "group-more" }] }
-                        : { label: "Shape", actions: [
+                        ? [{ icon: "fa-ellipsis-h", label: "Group properties", action: "group-more" }]
+                        : [
                             { icon: "fa-cube", label: "3D effect", action: "shape-3d" },
                             { icon: "fa-undo", label: "Reset shape properties", action: "shape-reset" }
-                        ] });
-                renderMoreActionsMenu([typeSpecificMoreSection, ...commonMoreSections]);
+                        ]);
+                const objectSection = commonMoreSections.find((section) => section.category === "object");
+                objectSection.actions = [...typeSpecificObjectActions, ...objectSection.actions];
+                setMoreActionSections(commonMoreSections);
                 bar.innerHTML = dragHandle
                     + (targetType === "group" ? button("fa-pencil", "Edit group objects", "edit-group") : "")
                     + (canFill ? colorButton(safeShapeFill, safeShapeStroke) : "")
@@ -3842,7 +4210,7 @@
                         )
                         : "")
                     + (targetType === "image" ? button("fa-expand", "Image Scale", "image-scale") : "")
-                    + groupedActionSources(typeSpecificSecondaryActions + commonSecondaryActions) + moreActionsButton
+                    + effectsAction + groupedActionSources(typeSpecificSecondaryActions + commonSecondaryActions) + categorisedActionButtons
                     + button("fa-trash", "Delete", "delete") + button("fa-times", "Close quick actions", "close-toolbar");
             }
             /* STAMP: 2026-09-13 - Locked objects remain selectable so the
@@ -3857,6 +4225,10 @@
                 control.disabled = hasLockedTransform;
                 control.setAttribute("aria-disabled", String(hasLockedTransform));
             });
+            const effectsControl = bar.querySelector('[data-cg-selection-action="effects"]');
+            const hasEffects = selectionTargets.some((object) => window.CGObjectEffects?.hasEffect(object));
+            effectsControl?.classList.toggle("is-active", hasEffects);
+            effectsControl?.setAttribute("aria-pressed", String(hasEffects));
             moreActionsPopover.querySelectorAll("[data-cg-more-action]").forEach((control) => {
                 const source = bar.querySelector(`[data-cg-selection-action="${control.dataset.cgMoreAction}"]`);
                 control.disabled = Boolean(source?.disabled);
@@ -3874,6 +4246,7 @@
                 formatPainterControl.classList.toggle("is-active", isFormatPainterActive);
                 formatPainterControl.setAttribute("aria-pressed", String(isFormatPainterActive));
             }
+            highlightCurrentQuickAction();
             bar.hidden = false;
             window.requestAnimationFrame(position);
         };
@@ -3882,6 +4255,11 @@
             const linkControl = event.target.closest('[data-cg-selection-action="link"]');
             if (linkControl) linkSelectionScope = getLinkSelectionScope(activeCanvas && activeCanvas.getActiveObject());
             event.stopPropagation();
+        });
+        window.addEventListener("cg:object-effects-changed", render);
+        bar.addEventListener("pointerover", (event) => {
+            if (!event.target.closest('[data-cg-selection-action="font-size"]')) return;
+            syncFontSizeTooltip(activeCanvas && activeCanvas.getActiveObject());
         });
         bar.addEventListener("pointerdown", (event) => {
             const handle = event.target.closest("[data-cg-selection-drag]");
@@ -3955,14 +4333,12 @@
             position();
         });
         document.addEventListener("mousedown", (event) => {
-            if (!shapeSizePopover.hidden && !shapeSizePopover.contains(event.target)
-                && !event.target.closest('[data-cg-selection-action="shape-size"]')) hidePopovers();
-            if (!fontPopover.hidden && !fontPopover.contains(event.target)
-                && !event.target.closest("[data-cg-selection-font-toggle]")) hidePopovers();
-            if (!colorPopover.hidden && !colorPopover.contains(event.target)
-                && !event.target.closest('[data-cg-selection-action="color-menu"]')) hidePopovers();
-            if (!textStylePopover.hidden && !textStylePopover.contains(event.target)
-                && !event.target.closest('[data-cg-selection-action="text-style"]')) hidePopovers();
+            /* STAMP: 2026-09-30 - Keep every Quick Controls property popover
+             * open while its buttons, inputs, and delegated legacy controls
+             * run. A press on the real Fabric canvas is the shared close rule. */
+            if (event.target === activeCanvas?.upperCanvasEl || event.target === activeCanvas?.lowerCanvasEl) {
+                hidePopovers();
+            }
         });
         opacityPopover.addEventListener("mousedown", (event) => event.stopPropagation());
         linkPopover.addEventListener("mousedown", (event) => event.stopPropagation());
@@ -3973,11 +4349,43 @@
         interactionPopover.addEventListener("mousedown", (event) => event.stopPropagation());
         motionPopover.addEventListener("mousedown", (event) => event.stopPropagation());
         textMorePopover.addEventListener("mousedown", (event) => event.stopPropagation());
+        textListPopover.addEventListener("mousedown", (event) => event.stopPropagation());
+        textListPopover.addEventListener("click", (event) => {
+            if (event.target.closest("[data-cg-list-close]")) {
+                textListPopover.hidden = true;
+                bar.querySelector('[data-cg-selection-action="text-list"]')?.setAttribute("aria-expanded", "false");
+                bar.querySelector('[data-cg-selection-action="text-list"]')?.focus();
+                return;
+            }
+            const choice = event.target.closest("[data-cg-text-list]");
+            if (!choice) return;
+            window.CGApplyTextList?.(choice.dataset.cgTextList);
+            const target = activeCanvas?.getActiveObject();
+            textListPopover.querySelectorAll('[role="menuitemradio"]').forEach((item) => item.setAttribute("aria-checked", String(item.dataset.cgTextList === target?.cgTextListStyle)));
+            textListPopover.querySelector('[data-cg-text-list="none"]').disabled = !target?.cgTextListStyle;
+            bar.querySelector('[data-cg-selection-action="text-list"]')?.setAttribute("aria-expanded", "true");
+            position();
+        });
+        textListPopover.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") return;
+            event.preventDefault();
+            textListPopover.hidden = true;
+            bar.querySelector('[data-cg-selection-action="text-list"]')?.setAttribute("aria-expanded", "false");
+            bar.querySelector('[data-cg-selection-action="text-list"]')?.focus();
+        });
         fontPopover.addEventListener("mousedown", (event) => event.stopPropagation());
         textSizePopover.addEventListener("mousedown", (event) => event.stopPropagation());
+        textSizePopover.addEventListener("input", () => {
+            syncFontSizeTooltip(activeCanvas && activeCanvas.getActiveObject());
+        });
         headingPopover.addEventListener("mousedown", (event) => event.stopPropagation());
         textAlignmentPopover.addEventListener("mousedown", (event) => event.stopPropagation());
-        colorPopover.addEventListener("mousedown", (event) => event.stopPropagation());
+        /* STAMP: 2026-09-15 - Minicolors owns document-level pointer tracking
+         * for its saturation and hue surfaces. Let picker-panel mousedown
+         * events reach that owner; other Colour-popover presses remain local. */
+        colorPopover.addEventListener("mousedown", (event) => {
+            if (!event.target.closest(".minicolors-panel")) event.stopPropagation();
+        });
         textStylePopover.addEventListener("mousedown", (event) => event.stopPropagation());
         shapeMorePopover.addEventListener("mousedown", (event) => event.stopPropagation());
         imageMorePopover.addEventListener("mousedown", (event) => event.stopPropagation());
@@ -3986,35 +4394,42 @@
         moreActionsPopover.addEventListener("mousedown", (event) => event.stopPropagation());
         moreActionsPopover.addEventListener("click", (event) => {
             if (event.target.closest("[data-cg-more-close]")) {
+                const returnCategory = activeMoreCategory;
                 hidePopovers();
-                bar.querySelector('[data-cg-selection-action="more-actions"]')?.focus();
+                bar.querySelector(`[data-cg-selection-action="more-${returnCategory}"]`)?.focus();
                 return;
             }
             const menuControl = event.target.closest("[data-cg-more-action]");
             if (!menuControl || menuControl.disabled) return;
             const sourceControl = bar.querySelector(`[data-cg-selection-action="${menuControl.dataset.cgMoreAction}"]`);
             if (!sourceControl || sourceControl.disabled) return;
+            const menuRect = moreActionsPopover.getBoundingClientRect();
+            const replacementOrigin = { left: menuRect.left, top: menuRect.top };
             if (menuControl.dataset.cgMoreAction.startsWith("dropdown-")) {
                 const target = activeCanvas?.getActiveObject();
                 if (!target) return;
+                const dropdownAnchor = { cgReplacementOrigin: replacementOrigin };
                 hidePopovers();
                 window.openQuickActionDropdown?.(
                     target,
                     menuControl.dataset.cgMoreAction.replace("dropdown-", ""),
-                    bar.querySelector('[data-cg-selection-action="more-actions"]')
+                    dropdownAnchor
                 );
                 return;
             }
             hidePopovers();
             sourceControl.click();
+            categoryPanelOrigin = replacementOrigin;
+            window.requestAnimationFrame(position);
         });
         moreActionsPopover.addEventListener("keydown", (event) => {
             const controls = Array.from(moreActionsPopover.querySelectorAll("[data-cg-more-action]:not(:disabled)"));
             const index = controls.indexOf(document.activeElement);
             if (event.key === "Escape") {
                 event.preventDefault();
+                const returnCategory = activeMoreCategory;
                 hidePopovers();
-                bar.querySelector('[data-cg-selection-action="more-actions"]')?.focus();
+                bar.querySelector(`[data-cg-selection-action="more-${returnCategory}"]`)?.focus();
             } else if ((event.key === "ArrowDown" || event.key === "ArrowUp") && controls.length) {
                 event.preventDefault();
                 const direction = event.key === "ArrowDown" ? 1 : -1;
@@ -4032,15 +4447,9 @@
             if (tab && target) {
                 colorMode = tab.dataset.cgColorTab;
                 syncColorPopover(target);
+                openEmbeddedColorPalette(target);
                 return;
             }
-            if (!event.target.closest("[data-cg-color-choose]") || !target) return;
-            const isStroke = colorMode === "stroke";
-            const source = document.getElementById(isText(target)
-                ? (isStroke ? "FontStroke" : "FontColor")
-                : (isStroke ? "objstrokecolor" : "objbackcolor"));
-            if (source) source.click();
-            window.requestAnimationFrame(() => window.CGPositionColorPickerForSelection?.(bar));
         });
         textStylePopover.addEventListener("click", (event) => {
             if (event.target.closest("[data-cg-quick-close]")) {
@@ -4105,9 +4514,8 @@
             const selectedFont = option.dataset.cgFontOption;
             restoreFontPreview();
             fontPreviewState = null;
-            fontPopover.hidden = true;
             const toggle = bar.querySelector("[data-cg-selection-font-toggle]");
-            if (toggle) toggle.setAttribute("aria-expanded", "false");
+            if (toggle) toggle.setAttribute("aria-expanded", "true");
             if (typeof window.CGApplyTextFontFamily === "function") {
                 window.CGApplyTextFontFamily(target, selectedFont, () => {
                     if (toggle) {
@@ -4148,7 +4556,7 @@
             const target = activeCanvas && activeCanvas.getActiveObject();
             if (!control || !isText(target)) return;
             applyText(target, { textAlign: control.dataset.cgTextAlign });
-            textAlignmentPopover.hidden = true;
+            window.requestAnimationFrame(position);
         });
         textSizePopover.addEventListener("click", (event) => {
             if (!event.target.closest("[data-cg-text-size-reset]")) return;
@@ -4164,6 +4572,7 @@
             } else {
                 applyText(target, { fontSize: defaultSize });
             }
+            syncFontSizeTooltip(target);
         });
         headingPopover.addEventListener("click", (event) => {
             const control = event.target.closest("[data-cg-heading-level]");
@@ -4182,9 +4591,9 @@
                 target.dirty = true;
                 commit(target);
             };
-            headingPopover.hidden = true;
             if (typeof window.CGLoadCanvasFont === "function") window.CGLoadCanvasFont("Impact", applyHeading);
             else applyHeading();
+            window.requestAnimationFrame(position);
         });
         cropPopover.addEventListener("click", (event) => {
             if (event.target.closest("[data-cg-crop-reset]") && window.CGImageCropEditor) {
@@ -4276,7 +4685,7 @@
             else if (action === "front") targets.forEach((object) => activeCanvas.bringObjectToFront(object));
             else if (action === "back") targets.slice().reverse().forEach((object) => activeCanvas.sendObjectToBack(object));
             commit(target);
-            orderPopover.hidden = true;
+            window.requestAnimationFrame(position);
         });
         alignmentPopover.addEventListener("click", (event) => {
             const referenceControl = event.target.closest("[data-cg-alignment-reference]");
@@ -4301,7 +4710,6 @@
             } else if (control) {
                 alignSingleObject(target, control.dataset.cgAlignmentAction);
             }
-            alignmentPopover.hidden = true;
             window.requestAnimationFrame(position);
         });
         transformPopover.addEventListener("click", (event) => {
@@ -4316,7 +4724,7 @@
                 target.set(flipProperty, !target[flipProperty]);
             }
             commit(target);
-            transformPopover.hidden = true;
+            window.requestAnimationFrame(position);
         });
         bar.addEventListener("input", (event) => {
             const target = activeCanvas && activeCanvas.getActiveObject();
@@ -4331,6 +4739,12 @@
                 applyText(target, { fontSize: Number(event.target.value) || 20 });
             }
         });
+        bar.addEventListener("click", (event) => {
+            const control = event.target.closest("button");
+            if (!control || control.parentElement !== bar || control.disabled) return;
+            currentQuickAction = control.dataset.cgSelectionAction || (control.hasAttribute("data-cg-selection-font-toggle") ? "font-family" : "");
+            highlightCurrentQuickAction();
+        }, true);
         bar.addEventListener("click", (event) => {
             const fontToggle = event.target.closest("[data-cg-selection-font-toggle]");
             if (fontToggle) {
@@ -4437,6 +4851,7 @@
                     colorMode = "back";
                     syncColorPopover(target);
                     colorPopover.hidden = false;
+                    openEmbeddedColorPalette(target);
                     control.setAttribute("aria-expanded", "true");
                     window.requestAnimationFrame(() => {
                         position();
@@ -4457,18 +4872,28 @@
                     });
                 }
             }
-            else if (action === "text-more") {
+            else if (action === "text-list") {
+                const shouldOpen = textListPopover.hidden;
+                hidePopovers();
+                textListPopover.hidden = !shouldOpen;
+                textListPopover.querySelectorAll('[role="menuitemradio"]').forEach((item) => item.setAttribute("aria-checked", String(item.dataset.cgTextList === target.cgTextListStyle)));
+                textListPopover.querySelector('[data-cg-text-list="none"]').disabled = !target.cgTextListStyle;
+                bar.querySelector('[data-cg-selection-action="text-list"]')?.setAttribute("aria-expanded", String(shouldOpen));
+                window.requestAnimationFrame(() => { position(); if (shouldOpen) textListPopover.querySelector('[aria-checked="true"], [data-cg-text-list]')?.focus(); });
+            } else if (action === "text-more") {
                 const shouldOpen = textMorePopover.hidden;
                 hidePopovers();
                 textMorePopover.hidden = !shouldOpen;
                 window.requestAnimationFrame(position);
             }
-            else if (action === "more-actions") {
-                const shouldOpen = moreActionsPopover.hidden;
+            else if (["more-controls", "more-arrange", "more-object"].includes(action)) {
+                const category = action.replace("more-", "");
+                const shouldOpen = moreActionsPopover.hidden || activeMoreCategory !== category;
                 hidePopovers();
-                moreActionsPopover.hidden = !shouldOpen;
-                control.setAttribute("aria-expanded", String(shouldOpen));
-                if (shouldOpen) {
+                if (shouldOpen && renderMoreActionsMenu(category)) {
+                    activeMoreCategory = category;
+                    moreActionsPopover.hidden = false;
+                    control.setAttribute("aria-expanded", "true");
                     window.requestAnimationFrame(() => {
                         position();
                         moreActionsPopover.querySelector("[data-cg-more-action]:not(:disabled)")?.focus();
@@ -4592,6 +5017,7 @@
                     editable: !shouldLock
                 }));
                 commit(target);
+                showEditorFeedback("success", shouldLock ? "Object locked" : "Object unlocked", `${targets.length} selected object${targets.length === 1 ? "" : "s"} updated.`);
             }
             else if (action === "replace-image") document.getElementById("btnchangeimagepopup")?.click();
             else if (action === "download-image" && String(target.type).toLowerCase() === "image") {
@@ -4621,6 +5047,10 @@
                 render();
             }
             else if (action === "edit-group") openGroupEditor(target);
+            else if (action === "effects") {
+                hidePopovers();
+                window.CGObjectEffects?.open(target);
+            }
             else if (action === "close-toolbar") {
                 dismissedToolbarTarget = target;
                 hide();
@@ -4750,7 +5180,11 @@
                 if (event && event.target && event.target.isCropSelection && !cropPopover.hidden && window.CGImageCropEditor) {
                     syncCropControls(window.CGImageCropEditor.getSelectionState());
                 }
-                else if (event && event.preserveQuickPopover && (!cropPopover.hidden || !shapeSizePopover.hidden)) position();
+                /* STAMP: 2026-09-30 - Property changes must not rebuild the
+                 * toolbar while any Quick Controls panel is open. Rebuilding
+                 * calls hidePopovers(); repositioning preserves the active
+                 * panel until the author presses the Fabric canvas. */
+                else if (hasOpenQuickPopover()) position();
                 else render();
             });
             window.addEventListener("cg:animation-availability-changed", (event) => {
@@ -4760,6 +5194,7 @@
                 render();
             });
             window.addEventListener("cg:format-painter-changed", render);
+            window.addEventListener("cg:text-list-changed", render);
             activeCanvas.on("mouse:down", (event) => {
                 const nativeEvent = event && event.e;
                 if (event && event.target && nativeEvent && nativeEvent.button !== 2 && !nativeEvent.shiftKey && !nativeEvent.ctrlKey && !nativeEvent.metaKey) {
